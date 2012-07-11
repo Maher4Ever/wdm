@@ -9,7 +9,7 @@ WDM_PQueueItem
 wdm_queue_item_new() {
 	WDM_PQueueItem item;
 
-	item = (WDM_PQueueItem)malloc(sizeof(WDM_QueueItem));
+	item = ALLOC(WDM_QueueItem);
 	item->user_data = NULL;
 	item->previous	= NULL;
 	item->next		= NULL;
@@ -23,7 +23,7 @@ void
 wdm_queue_item_free(WDM_PQueueItem item) {
 	// We can't really do anything to the prev pointer nor the next pointer, 
 	// because we might break any linking the user has established.
-	free(item);
+	xfree(item);
 }
 
 
@@ -35,7 +35,7 @@ WDM_PQueue
 wdm_queue_new() {
 	WDM_PQueue queue;
 
-	queue = (WDM_PQueue)malloc(sizeof(WDM_Queue));
+	queue = ALLOC(WDM_Queue);
 	queue->front = NULL;
 	queue->rear  = NULL;
 
@@ -45,7 +45,7 @@ wdm_queue_new() {
 void 
 wdm_queue_free(WDM_PQueue queue) {
 	wdm_queue_empty(queue);
-	free(queue);
+	xfree(queue);
 }
 
 void 

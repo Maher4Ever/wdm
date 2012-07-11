@@ -7,7 +7,7 @@ WDM_PMonitor
 wdm_monitor_new() {
 	WDM_PMonitor monitor;
 
-	monitor = (WDM_PMonitor)malloc(sizeof(WDM_Monitor));
+	monitor = ALLOC(WDM_Monitor);
 
 	monitor->running = FALSE;
 
@@ -38,7 +38,7 @@ wdm_monitor_free(WDM_PMonitor monitor) {
 	CloseHandle(monitor->process_event); // TODO: Look into why this crashes the app when exiting!
 	CloseHandle(monitor->stop_event);
 
-	free(monitor);
+	xfree(monitor);
 }
 
 void 
@@ -53,7 +53,7 @@ WDM_PMonitorCallbackParam
 wdm_monitor_callback_param_new(WDM_PMonitor monitor, WDM_PEntry entry) {
 	WDM_PMonitorCallbackParam param;
 
-	param = (WDM_PMonitorCallbackParam)malloc(sizeof(WDM_MonitorCallbackParam));
+	param = ALLOC(WDM_MonitorCallbackParam);
 
 	param->monitor = monitor;
 	param->entry = entry;
@@ -63,5 +63,5 @@ wdm_monitor_callback_param_new(WDM_PMonitor monitor, WDM_PEntry entry) {
 
 void
 wdm_monitor_callback_param_free(WDM_PMonitorCallbackParam param) {
-	free(param);
+	xfree(param);
 }
