@@ -16,4 +16,8 @@ Gem::Specification.new do |gem|
   gem.version       = '0.0.1'
   
   gem.add_development_dependency 'rake-compiler' 
+  gem.add_development_dependency 'rspec'
+  gem.add_development_dependency 'guard-rspec'
+  gem.add_development_dependency 'rb-readline'
+  gem.add_development_dependency 'rb-notifu'
 end
