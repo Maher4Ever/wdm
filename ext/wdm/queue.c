@@ -1,4 +1,5 @@
-#include "global.h"
+#include "wdm.h"
+
 #include "queue.h"
 
 // ---------------------------------------------------------

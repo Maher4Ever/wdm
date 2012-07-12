@@ -1,15 +1,16 @@
-#include "global.h"
+#include "wdm.h"
+
 #include "entry.h"
 #include "queue.h"
 #include "monitor.h"
+
 #include "rb_monitor.h"
 
 // ----------------------------------------------------------
-// Cached values
+// Global variables
 // ----------------------------------------------------------
 
-static ID wdm_rb_sym_call;
-static rb_encoding *wdm_rb_enc_utf16;
+VALUE cWDM_Monitor;
 
 // ---------------------------------------------------------
 // Prototypes of static functions
@@ -82,7 +83,7 @@ static VALUE
 rb_monitor_watch(VALUE self, VALUE directory) {
     WDM_PMonitor monitor;
     WDM_PEntry entry;
-#ifdef  UNICODE
+#ifdef UNICODE
     VALUE wchar_directory;
 #endif
 
@@ -94,7 +95,7 @@ rb_monitor_watch(VALUE self, VALUE directory) {
     entry = wdm_entry_new();
     entry->user_data->callback =  rb_block_proc();
 
-#ifdef  UNICODE
+#ifdef UNICODE
     wchar_directory = rb_str_export_to_enc(directory, wdm_rb_enc_utf16);
     entry->user_data->dir = (LPTSTR)RSTRING_PTR(wchar_directory);
 #else
@@ -367,9 +368,6 @@ rb_monitor_stop(VALUE self) {
 void
 wdm_rb_monitor_init() {
     WDM_DEBUG("Registering WDM::Monitor with Ruby!");
-
-    wdm_rb_sym_call = rb_intern("call");
-    wdm_rb_enc_utf16 = rb_enc_find("UTF-16LE");
 
     cWDM_Monitor = rb_define_class_under(mWDM, "Monitor", rb_cObject);
 

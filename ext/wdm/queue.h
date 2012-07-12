@@ -1,4 +1,5 @@
 #include <Windows.h>
+
 #include "entry.h"
 
 #ifndef WDM_QUEUE_H

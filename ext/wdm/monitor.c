@@ -1,6 +1,8 @@
-#include "global.h"
+#include "wdm.h"
+
 #include "entry.h"
 #include "queue.h"
+
 #include "monitor.h"
 
 WDM_PMonitor

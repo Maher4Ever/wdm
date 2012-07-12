@@ -1,6 +1,6 @@
-#include "global.h"
+#include "wdm.h"
+
 #include "entry.h"
-#include "queue.h"
 
 // ---------------------------------------------------------
 // Entry user data functions

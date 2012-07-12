@@ -1,5 +1,3 @@
-#include "global.h"
-
 #ifndef WDM_ENTRY_H
 #define WDM_ENTRY_H
 

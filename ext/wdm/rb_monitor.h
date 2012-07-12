@@ -1,7 +1,3 @@
-#include "global.h"
-#include "entry.h"
-#include "queue.h"
-
 #ifndef WDM_RB_MONITOR_H
 #define WDM_RB_MONITOR_H
 
@@ -13,8 +9,7 @@ extern "C" {
 // Global variables
 // ----------------------------------------------------------
 
-extern VALUE mWDM;
-VALUE cWDM_Monitor;
+extern VALUE cWDM_Monitor;
 
 // ---------------------------------------------------------
 // Prototypes
