@@ -24,7 +24,7 @@ static void wdm_rb_register_monitoring_entry(WDM_PEntry);
 static DWORD WINAPI wdm_rb_start_monitoring(LPVOID);
 
 static VALUE wdm_rb_wait_for_changes(LPVOID);
-static VALUE wdm_rb_process_changes(WDM_PQueue);
+static void wdm_rb_process_changes(WDM_PQueue);
 static void wdm_rb_stop_monitoring(LPVOID);
 static VALUE wdm_rb_monitor_run_bang(VALUE);
 

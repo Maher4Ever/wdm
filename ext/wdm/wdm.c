@@ -87,7 +87,7 @@ wdm_rb_monitor_watch(VALUE self, VALUE directory) {
 #else
     entry->user_data->dir = RSTRING_PTR(directory);
 #endif
-
+ 
     entry->dir_handle = CreateFile(
         entry->user_data->dir,     // pointer to the file name
         FILE_LIST_DIRECTORY,       // access (read/write) mode
@@ -106,7 +106,7 @@ wdm_rb_monitor_watch(VALUE self, VALUE directory) {
     }
 
     Data_Get_Struct(self, WDM_Monitor, monitor);
-
+    
     // Store a reference to the entry instead of an event as the event
     // won't be used when using callbacks.
     entry->event_container.hEvent = wdm_monitor_callback_param_new(monitor, entry);
@@ -114,6 +114,8 @@ wdm_rb_monitor_watch(VALUE self, VALUE directory) {
     wdm_monitor_update_head(monitor, entry);
 
     WDM_DEBUG("Watching: '%s'", RSTRING_PTR(directory));
+
+    return Qnil;
 }
 
 void CALLBACK
@@ -223,7 +225,7 @@ wdm_rb_wait_for_changes(LPVOID param) {
     return WaitForSingleObject(process_event, INFINITE) == WAIT_OBJECT_0 ? Qtrue : Qfalse;
 }
 
-static VALUE 
+static void 
 wdm_rb_process_changes(WDM_PQueue changes) {
     WDM_PQueueItem item;
 
