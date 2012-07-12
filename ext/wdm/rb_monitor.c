@@ -371,7 +371,6 @@ wdm_rb_monitor_init() {
     wdm_rb_sym_call = rb_intern("call");
     wdm_rb_enc_utf16 = rb_enc_find("UTF-16LE");
 
-    mWDM = rb_define_module("WDM");
     cWDM_Monitor = rb_define_class_under(mWDM, "Monitor", rb_cObject);
 
     rb_define_alloc_func(cWDM_Monitor, rb_monitor_alloc);
