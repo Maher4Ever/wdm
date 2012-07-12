@@ -2,8 +2,8 @@
 #include "entry.h"
 #include "queue.h"
 
-#ifndef WDM_H
-#define WDM_H
+#ifndef WDM_RB_MONITOR_H
+#define WDM_RB_MONITOR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,13 +13,14 @@ extern "C" {
 // Global variables
 // ----------------------------------------------------------
 
-VALUE mWDM;
+extern VALUE mWDM;
+VALUE cWDM_Monitor;
 
 // ---------------------------------------------------------
 // Prototypes
 // ---------------------------------------------------------
 
-void Init_wdm();
+void wdm_rb_monitor_init();
 
 // ---------------------------------------------------------
 
@@ -27,4 +28,4 @@ void Init_wdm();
 }
 #endif // __cplusplus
 
-#endif // WDM_H
+#endif // WDM_RB_MONITOR_H
