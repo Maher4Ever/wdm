@@ -14,18 +14,18 @@ extern "C" {
 // ---------------------------------------------------------
 
 typedef struct {
-	BOOL running;
-	WDM_PEntry head;
-	WDM_PQueue changes;
-	CRITICAL_SECTION lock;
-	HANDLE monitoring_thread;
-	HANDLE process_event;
-	HANDLE stop_event;
+    BOOL running;
+    WDM_PEntry head;
+    WDM_PQueue changes;
+    CRITICAL_SECTION lock;
+    HANDLE monitoring_thread;
+    HANDLE process_event;
+    HANDLE stop_event;
 } WDM_Monitor, *WDM_PMonitor;
 
 typedef struct {
-	WDM_PEntry entry;
-	WDM_PMonitor monitor;
+    WDM_PEntry entry;
+    WDM_PMonitor monitor;
 } WDM_MonitorCallbackParam, *WDM_PMonitorCallbackParam;
 
 // ---------------------------------------------------------

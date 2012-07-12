@@ -12,17 +12,17 @@ extern "C" {
 // ---------------------------------------------------------
 
 typedef struct {
-	LPTSTR dir;							// Name of directory to watch
-	VALUE callback;						// Proc object to call when there are changes
-	BOOL watch_childeren;				// Watch sub-directories
+    LPTSTR dir;                            // Name of directory to watch
+    VALUE callback;                        // Proc object to call when there are changes
+    BOOL watch_childeren;                // Watch sub-directories
 } WDM_EntryUserData, *WDM_PEntryUserData;
 
 typedef struct WDM_Entry {
-	WDM_PEntryUserData user_data;		// User-supplied data
-	HANDLE dir_handle;					// IO handle of the directory
-	BYTE buffer[WDM_BUFFER_SIZE];		// Buffer for the results
-	OVERLAPPED event_container;			// Async IO event container
-	struct WDM_Entry* next;				// Well, this is a linked list, so this is self-explanatory :)
+    WDM_PEntryUserData user_data;        // User-supplied data
+    HANDLE dir_handle;                    // IO handle of the directory
+    BYTE buffer[WDM_BUFFER_SIZE];        // Buffer for the results
+    OVERLAPPED event_container;            // Async IO event container
+    struct WDM_Entry* next;                // Well, this is a linked list, so this is self-explanatory :)
 } WDM_Entry, *WDM_PEntry;
 
 // ---------------------------------------------------------

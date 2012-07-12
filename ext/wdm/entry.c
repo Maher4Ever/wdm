@@ -8,20 +8,20 @@
 
 WDM_PEntryUserData
 wdm_entry_user_data_new() {
-	WDM_PEntryUserData user_data;
-	
-	user_data = ALLOC(WDM_EntryUserData);
+    WDM_PEntryUserData user_data;
+    
+    user_data = ALLOC(WDM_EntryUserData);
 
-	user_data->dir = NULL;
-	user_data->watch_childeren = FALSE;
+    user_data->dir = NULL;
+    user_data->watch_childeren = FALSE;
 
-	return user_data;
+    return user_data;
 }
 
 void 
 wdm_entry_user_data_free(WDM_PEntryUserData user_data) {
-	if ( user_data->dir != NULL ) xfree(user_data->dir);
-	xfree(user_data);
+    if ( user_data->dir != NULL ) xfree(user_data->dir);
+    xfree(user_data);
 }
 
 // ---------------------------------------------------------
@@ -30,37 +30,38 @@ wdm_entry_user_data_free(WDM_PEntryUserData user_data) {
 
 WDM_PEntry
 wdm_entry_new() {
-	WDM_PEntry entry;
-	
-	entry = ALLOC(WDM_Entry);
+    WDM_PEntry entry;
+    
+    entry = ALLOC(WDM_Entry);
 
-	entry->user_data = wdm_entry_user_data_new();
-	entry->dir_handle = INVALID_HANDLE_VALUE;
-	entry->next = NULL;
+    entry->user_data = wdm_entry_user_data_new();
+    entry->dir_handle = INVALID_HANDLE_VALUE;
+    entry->next = NULL;
 
-	ZeroMemory(&entry->buffer, WDM_BUFFER_SIZE);
-	ZeroMemory(&entry->event_container, sizeof(OVERLAPPED));
+    ZeroMemory(&entry->buffer, WDM_BUFFER_SIZE);
+    ZeroMemory(&entry->event_container, sizeof(OVERLAPPED));
 
-	return entry;
+    return entry;
 }
 
 void
 wdm_entry_free(WDM_PEntry entry) {
-	if ( entry->dir_handle != INVALID_HANDLE_VALUE ) {
-		CancelIo(entry->dir_handle); // Stop monitoring changes
-		CloseHandle(entry->dir_handle);
-	}
-	wdm_entry_user_data_free(entry->user_data);
-	xfree(entry);
+    if ( entry->dir_handle != INVALID_HANDLE_VALUE ) {
+        CancelIo(entry->dir_handle); // Stop monitoring changes
+        CloseHandle(entry->dir_handle);
+    }
+    wdm_entry_user_data_free(entry->user_data);
+    xfree(entry);
 }
 
 void 
 wdm_entry_list_free(WDM_PEntry entry) {
-	WDM_PEntry tmp;
+    WDM_PEntry tmp;
 
-	while(entry != NULL) {
-		tmp = entry;
-		entry = entry->next;
-		wdm_entry_free(tmp);
-	}
+    while(entry != NULL) {
+        tmp = entry;
+        entry = entry->next;
+        wdm_entry_free(tmp);
+    }
 }
+

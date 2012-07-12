@@ -5,63 +5,63 @@
 
 WDM_PMonitor 
 wdm_monitor_new() {
-	WDM_PMonitor monitor;
+    WDM_PMonitor monitor;
 
-	monitor = ALLOC(WDM_Monitor);
+    monitor = ALLOC(WDM_Monitor);
 
-	monitor->running = FALSE;
+    monitor->running = FALSE;
 
-	monitor->head = NULL;
-	monitor->monitoring_thread = INVALID_HANDLE_VALUE;
+    monitor->head = NULL;
+    monitor->monitoring_thread = INVALID_HANDLE_VALUE;
 
-	monitor->changes = wdm_queue_new();
+    monitor->changes = wdm_queue_new();
 
-	monitor->process_event = CreateEvent(NULL, TRUE, FALSE, NULL);
-	monitor->stop_event = CreateEvent(NULL, TRUE, FALSE, NULL);
+    monitor->process_event = CreateEvent(NULL, TRUE, FALSE, NULL);
+    monitor->stop_event = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-	if ( ! InitializeCriticalSectionAndSpinCount(&monitor->lock, 
-			0x00000400) ) // TODO: look into the best value for spinning.
-	{
-		rb_raise(rb_eRuntimeError, "Can't create a lock for the monitor");
-	}
+    if ( ! InitializeCriticalSectionAndSpinCount(&monitor->lock, 
+            0x00000400) ) // TODO: look into the best value for spinning.
+    {
+        rb_raise(rb_eRuntimeError, "Can't create a lock for the monitor");
+    }
 
-	return monitor;
+    return monitor;
 }
 
 void 
 wdm_monitor_free(WDM_PMonitor monitor) {
-	if ( monitor->monitoring_thread != INVALID_HANDLE_VALUE ) CloseHandle(monitor->monitoring_thread);
+    if ( monitor->monitoring_thread != INVALID_HANDLE_VALUE ) CloseHandle(monitor->monitoring_thread);
 
-	wdm_entry_list_free(monitor->head);
-	wdm_queue_free(monitor->changes);
-	DeleteCriticalSection(&monitor->lock);
-	CloseHandle(monitor->process_event); // TODO: Look into why this crashes the app when exiting!
-	CloseHandle(monitor->stop_event);
+    wdm_entry_list_free(monitor->head);
+    wdm_queue_free(monitor->changes);
+    DeleteCriticalSection(&monitor->lock);
+    CloseHandle(monitor->process_event); // TODO: Look into why this crashes the app when exiting!
+    CloseHandle(monitor->stop_event);
 
-	xfree(monitor);
+    xfree(monitor);
 }
 
 void 
 wdm_monitor_update_head(WDM_PMonitor monitor, WDM_PEntry new_head) {
-	EnterCriticalSection(&monitor->lock);
-		new_head->next = monitor->head;
-		monitor->head = new_head;
-	LeaveCriticalSection(&monitor->lock);
+    EnterCriticalSection(&monitor->lock);
+        new_head->next = monitor->head;
+        monitor->head = new_head;
+    LeaveCriticalSection(&monitor->lock);
 }
 
 WDM_PMonitorCallbackParam 
 wdm_monitor_callback_param_new(WDM_PMonitor monitor, WDM_PEntry entry) {
-	WDM_PMonitorCallbackParam param;
+    WDM_PMonitorCallbackParam param;
 
-	param = ALLOC(WDM_MonitorCallbackParam);
+    param = ALLOC(WDM_MonitorCallbackParam);
 
-	param->monitor = monitor;
-	param->entry = entry;
+    param->monitor = monitor;
+    param->entry = entry;
 
-	return param;
+    return param;
 }
 
 void
 wdm_monitor_callback_param_free(WDM_PMonitorCallbackParam param) {
-	xfree(param);
+    xfree(param);
 }

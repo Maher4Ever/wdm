@@ -13,15 +13,15 @@ extern "C" {
 // ---------------------------------------------------------
 
 typedef struct WDM_QueueItem {
-	WDM_PEntryUserData user_data;
-	BYTE buffer[WDM_BUFFER_SIZE];
-	struct WDM_QueueItem* previous;
-	struct WDM_QueueItem* next;
+    WDM_PEntryUserData user_data;
+    BYTE buffer[WDM_BUFFER_SIZE];
+    struct WDM_QueueItem* previous;
+    struct WDM_QueueItem* next;
 } WDM_QueueItem, *WDM_PQueueItem;
 
 typedef struct WDM_Queue {
-	WDM_PQueueItem front;
-	WDM_PQueueItem rear;
+    WDM_PQueueItem front;
+    WDM_PQueueItem rear;
 } WDM_Queue, *WDM_PQueue;
 
 // ---------------------------------------------------------
