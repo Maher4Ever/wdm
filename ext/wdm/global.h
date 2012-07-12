@@ -18,7 +18,7 @@ extern "C" {
 
 #define WDM_DEBUG_ENABLED TRUE
 
-#define    WDM_BUFFER_SIZE 16384 // 2^14 or 16Kb
+#define WDM_BUFFER_SIZE 16384 // 2^14 or 16Kb
 
 // ---------------------------------------------------------
 // Macros

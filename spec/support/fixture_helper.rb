@@ -24,17 +24,17 @@ module WDM
       FileUtils.rm_rf(path) if File.exists?(path)
     end
 
-    # Prepares the monitor for the test with a fixture directory and the given 
-    # callback, then it yields back to the user. It also gives time for 
+    # Prepares the monitor for the test with a fixture directory and the given
+    # callback, then it yields back to the user. It also gives time for
     # the callbacks to be called. After the tests run, it stops the monitor.
     #
     # @yield
-    # 
+    #
     def watch_fixture_with(monitor, callback)
       fixture do |f|
         monitor.watch(f, &callback)
 
-        thread = Thread.new(monitor) { |m| m.run! } 
+        thread = Thread.new(monitor) { |m| m.run! }
         sleep(0.1) # give time for the monitor to bootup
 
         yield

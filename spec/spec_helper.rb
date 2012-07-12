@@ -9,6 +9,6 @@ RSpec.configure do |config|
   config.filter_run :focus
 
   config.before(:all) { `rake compile` }
-  
+
   config.include WDM::SpecHelpers
 end
