@@ -3,7 +3,7 @@
 #include "queue.h"
 #include "monitor.h"
 
-WDM_PMonitor 
+WDM_PMonitor
 wdm_monitor_new() {
     WDM_PMonitor monitor;
 
@@ -19,7 +19,7 @@ wdm_monitor_new() {
     monitor->process_event = CreateEvent(NULL, TRUE, FALSE, NULL);
     monitor->stop_event = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-    if ( ! InitializeCriticalSectionAndSpinCount(&monitor->lock, 
+    if ( ! InitializeCriticalSectionAndSpinCount(&monitor->lock,
             0x00000400) ) // TODO: look into the best value for spinning.
     {
         rb_raise(rb_eRuntimeError, "Can't create a lock for the monitor");
@@ -28,7 +28,7 @@ wdm_monitor_new() {
     return monitor;
 }
 
-void 
+void
 wdm_monitor_free(WDM_PMonitor monitor) {
     if ( monitor->monitoring_thread != INVALID_HANDLE_VALUE ) CloseHandle(monitor->monitoring_thread);
 
@@ -41,7 +41,7 @@ wdm_monitor_free(WDM_PMonitor monitor) {
     xfree(monitor);
 }
 
-void 
+void
 wdm_monitor_update_head(WDM_PMonitor monitor, WDM_PEntry new_head) {
     EnterCriticalSection(&monitor->lock);
         new_head->next = monitor->head;
@@ -49,7 +49,7 @@ wdm_monitor_update_head(WDM_PMonitor monitor, WDM_PEntry new_head) {
     LeaveCriticalSection(&monitor->lock);
 }
 
-WDM_PMonitorCallbackParam 
+WDM_PMonitorCallbackParam
 wdm_monitor_callback_param_new(WDM_PMonitor monitor, WDM_PEntry entry) {
     WDM_PMonitorCallbackParam param;
 

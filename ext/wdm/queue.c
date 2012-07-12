@@ -5,7 +5,7 @@
 // Queue item functions
 // ---------------------------------------------------------
 
-WDM_PQueueItem 
+WDM_PQueueItem
 wdm_queue_item_new() {
     WDM_PQueueItem item;
 
@@ -19,19 +19,18 @@ wdm_queue_item_new() {
     return item;
 }
 
-void 
+void
 wdm_queue_item_free(WDM_PQueueItem item) {
-    // We can't really do anything to the prev pointer nor the next pointer, 
+    // We can't really do anything to the prev pointer nor the next pointer,
     // because we might break any linking the user has established.
     xfree(item);
 }
-
 
 // ---------------------------------------------------------
 // Queue functions
 // ---------------------------------------------------------
 
-WDM_PQueue 
+WDM_PQueue
 wdm_queue_new() {
     WDM_PQueue queue;
 
@@ -42,13 +41,13 @@ wdm_queue_new() {
     return queue;
 }
 
-void 
+void
 wdm_queue_free(WDM_PQueue queue) {
     wdm_queue_empty(queue);
     xfree(queue);
 }
 
-void 
+void
 wdm_queue_enqueue(WDM_PQueue queue, WDM_PQueueItem item) {
     if ( queue->rear == NULL && queue->front == NULL )  {
         queue->front = queue->rear = item;
@@ -60,7 +59,7 @@ wdm_queue_enqueue(WDM_PQueue queue, WDM_PQueueItem item) {
     }
 }
 
-WDM_PQueueItem 
+WDM_PQueueItem
 wdm_queue_dequeue(WDM_PQueue queue) {
     WDM_PQueueItem item;
 

@@ -9,7 +9,7 @@
 WDM_PEntryUserData
 wdm_entry_user_data_new() {
     WDM_PEntryUserData user_data;
-    
+
     user_data = ALLOC(WDM_EntryUserData);
 
     user_data->dir = NULL;
@@ -18,7 +18,7 @@ wdm_entry_user_data_new() {
     return user_data;
 }
 
-void 
+void
 wdm_entry_user_data_free(WDM_PEntryUserData user_data) {
     if ( user_data->dir != NULL ) xfree(user_data->dir);
     xfree(user_data);
@@ -31,7 +31,7 @@ wdm_entry_user_data_free(WDM_PEntryUserData user_data) {
 WDM_PEntry
 wdm_entry_new() {
     WDM_PEntry entry;
-    
+
     entry = ALLOC(WDM_Entry);
 
     entry->user_data = wdm_entry_user_data_new();
@@ -54,7 +54,7 @@ wdm_entry_free(WDM_PEntry entry) {
     xfree(entry);
 }
 
-void 
+void
 wdm_entry_list_free(WDM_PEntry entry) {
     WDM_PEntry tmp;
 
@@ -64,4 +64,3 @@ wdm_entry_list_free(WDM_PEntry entry) {
         wdm_entry_free(tmp);
     }
 }
-

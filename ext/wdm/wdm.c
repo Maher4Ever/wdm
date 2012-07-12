@@ -39,9 +39,9 @@ static void
 wdm_rb_monitor_free(LPVOID param) {
     WDM_PMonitor monitor;
     WDM_PEntry entry;
-    
+
     WDM_DEBUG("Freeing a monitor object!");
-    
+
     monitor = (WDM_PMonitor)param;
     entry = monitor->head;
 
@@ -106,7 +106,7 @@ wdm_rb_monitor_watch(VALUE self, VALUE directory) {
     }
 
     Data_Get_Struct(self, WDM_Monitor, monitor);
-  
+
     // Store a reference to the entry instead of an event as the event
     // won't be used when using callbacks.
     entry->event_container.hEvent = wdm_monitor_callback_param_new(monitor, entry);
@@ -129,7 +129,7 @@ wdm_rb_handle_entry_change(
 
     if ( err_code == ERROR_OPERATION_ABORTED ) {
         // Async operation was canceld. This shouldn't happen.
-        // TODO: 
+        // TODO:
         //   1. Maybe add a union in the queue for errors?
         //   2. What's the best action when this happens?
         WDM_DEBUG("Dir handler closed in the process callback!");
@@ -161,7 +161,7 @@ wdm_rb_handle_entry_change(
     if ( WaitForSingleObject( param->monitor->process_event, 0) != WAIT_OBJECT_0 ) { // Check if already signaled
         SetEvent(param->monitor->process_event);
     }
-} 
+}
 
 static void
 wdm_rb_register_monitoring_entry(WDM_PEntry entry) {
@@ -176,7 +176,7 @@ wdm_rb_register_monitoring_entry(WDM_PEntry entry) {
         entry->user_data->watch_childeren,  // monitoring option
         FILE_NOTIFY_CHANGE_LAST_WRITE       // filter conditions
             | FILE_NOTIFY_CHANGE_CREATION
-            | FILE_NOTIFY_CHANGE_FILE_NAME,        
+            | FILE_NOTIFY_CHANGE_FILE_NAME,
         &bytes,                             // bytes returned
         &entry->event_container,            // overlapped buffer
         &wdm_rb_handle_entry_change         // process callback
@@ -225,7 +225,7 @@ wdm_rb_wait_for_changes(LPVOID param) {
     return WaitForSingleObject(process_event, INFINITE) == WAIT_OBJECT_0 ? Qtrue : Qfalse;
 }
 
-static void 
+static void
 wdm_rb_process_changes(WDM_PQueue changes) {
     WDM_PQueueItem item;
 
@@ -303,14 +303,14 @@ wdm_rb_monitor_run_bang(VALUE self) {
     ResetEvent(monitor->process_event);
     ResetEvent(monitor->stop_event);
 
-    monitor->monitoring_thread = CreateThread( 
+    monitor->monitoring_thread = CreateThread(
         NULL,                     // default security attributes
-        0,                        // use default stack size  
+        0,                        // use default stack size
         wdm_rb_start_monitoring,  // thread function name
-        monitor,                  // argument to thread function 
-        0,                        // use default creation flags 
-        &thread_id                // returns the thread identifier 
-    );    
+        monitor,                  // argument to thread function
+        0,                        // use default creation flags
+        &thread_id                // returns the thread identifier
+    );
 
     if ( monitor->monitoring_thread == NULL ) {
         rb_raise(rb_eRuntimeError, "Can't create a thread for the monitor!");
@@ -327,7 +327,7 @@ wdm_rb_monitor_run_bang(VALUE self) {
             wdm_queue_empty(monitor->changes);
             return;
         }
-        
+
         wdm_rb_process_changes(monitor->changes);
 
         if ( ! ResetEvent(monitor->process_event) ) {
