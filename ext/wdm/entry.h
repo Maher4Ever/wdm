@@ -10,7 +10,7 @@ extern "C" {
 // ---------------------------------------------------------
 
 typedef struct {
-    LPTSTR dir;                             // Name of directory to watch
+    LPWSTR dir;                             // Name of directory to watch
     VALUE callback;                         // Proc object to call when there are changes
     BOOL watch_childeren;                   // Watch sub-directories
 } WDM_EntryUserData, *WDM_PEntryUserData;

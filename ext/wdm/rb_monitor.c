@@ -1,4 +1,4 @@
-#include "wdm.h"
+﻿#include "wdm.h"
 
 #include "entry.h"
 #include "queue.h"
@@ -83,9 +83,8 @@ static VALUE
 rb_monitor_watch(VALUE self, VALUE directory) {
     WDM_PMonitor monitor;
     WDM_PEntry entry;
-#ifdef UNICODE
-    VALUE wchar_directory;
-#endif
+    int directory_letters_count;
+    VALUE os_encoded_directory;
 
     Check_Type(directory, T_STRING);
 
@@ -95,14 +94,30 @@ rb_monitor_watch(VALUE self, VALUE directory) {
     entry = wdm_entry_new();
     entry->user_data->callback =  rb_block_proc();
 
-#ifdef UNICODE
-    wchar_directory = rb_str_export_to_enc(directory, wdm_rb_enc_utf16);
-    entry->user_data->dir = (LPTSTR)RSTRING_PTR(wchar_directory);
-#else
-    entry->user_data->dir = RSTRING_PTR(directory);
-#endif
+    // WTF Ruby source: The original code (file.c) uses the following macro to make sure that the encoding
+    // of the string is ASCII-compatible, but UTF-16LE (Windows default encoding) is not!!!
+    //
+    // FilePathValue(directory);
 
-    entry->dir_handle = CreateFile(
+    os_encoded_directory = rb_str_encode_ospath(directory);
+
+    // RSTRING_LEN can't be used because it would return the count of bytes the string uses in its encoding (like UTF-8).
+    // UTF-8 might use more than one byte for the char, which is not needed for WCHAR strings.
+    // Also, the result of MultiByteToWideChar _includes_ the NULL char at the end, which is not true for RSTRING.
+    //
+    // Example: 'C:\Users\Maher\Desktop\تجربة' with __ENCODING__ == UTF-8
+    //   MultiByteToWideChar => 29 (28-char + null)
+    //   RSTRING_LEN => 33 (23-char + 10-bytes for 5 Arabic letters which take 2 bytes each)
+    //
+    directory_letters_count = MultiByteToWideChar(CP_UTF8, 0, RSTRING_PTR(os_encoded_directory), -1, NULL, 0);
+
+    entry->user_data->dir = ALLOC_N(WCHAR, directory_letters_count);
+    MultiByteToWideChar(CP_UTF8, 0, RSTRING_PTR(os_encoded_directory), -1, entry->user_data->dir, directory_letters_count);
+
+    // Tell the GC to collect the tmp string
+    rb_str_resize(os_encoded_directory, 0);
+
+    entry->dir_handle = CreateFileW(
         entry->user_data->dir,     // pointer to the file name
         FILE_LIST_DIRECTORY,       // access (read/write) mode
         FILE_SHARE_READ            // share mode
@@ -127,7 +142,7 @@ rb_monitor_watch(VALUE self, VALUE directory) {
 
     wdm_monitor_update_head(monitor, entry);
 
-    WDM_DEBUG("Watching: '%s'", RSTRING_PTR(directory));
+    WDM_WDEBUG("Watching: '%s'", entry->user_data->dir);
 
     return Qnil;
 }
