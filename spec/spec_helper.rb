@@ -10,5 +10,8 @@ RSpec.configure do |config|
 
   config.before(:all) { `rake compile` }
 
-  config.include WDM::SpecHelpers
+  config.include WDM::SpecSupport
 end
+
+# Be verbose about errors in threads
+Thread.abort_on_exception = true
