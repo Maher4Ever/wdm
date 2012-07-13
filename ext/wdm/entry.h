@@ -1,3 +1,6 @@
+#include <Windows.h>
+#include <ruby.h>
+
 #ifndef WDM_ENTRY_H
 #define WDM_ENTRY_H
 
