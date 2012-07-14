@@ -13,7 +13,6 @@
 
 // The _wsplitpat constants account for two NULL chars, so substract 1 because we only need one!
 #define WDM_MAX_FILENAME (_MAX_FNAME + _MAX_EXT - 1)
-#define WDM_MAX_WCHAR_LONG_PATH 32767
 
 // ----------------------------------------------------------
 // Global variables

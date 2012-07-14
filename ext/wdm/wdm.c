@@ -13,6 +13,8 @@
 
 VALUE mWDM;
 
+VALUE eWDM_InvalidDirectoryError;
+
 ID wdm_rb_sym_call;
 ID wdm_rb_sym_at_file;
 ID wdm_rb_sym_at_type;
@@ -42,6 +44,8 @@ Init_wdm() {
     wdm_rb_enc_utf8 = rb_utf8_encoding();
 
     mWDM = rb_define_module("WDM");
+
+    eWDM_InvalidDirectoryError = rb_define_class_under(mWDM, "InvalidDirectoryError", rb_eStandardError);
 
     wdm_rb_monitor_init();
     wdm_rb_change_init();

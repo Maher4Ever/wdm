@@ -27,6 +27,10 @@ extern "C" {
 
 #define WDM_BUFFER_SIZE 16384 // 2^14 or 16Kb
 
+// The maximum WCHAR's for buffers used in functions that have
+// a unicode variant and require to prepend "\\?\" to the path
+#define WDM_MAX_WCHAR_LONG_PATH 32767
+
 // ---------------------------------------------------------
 // Macros
 // ---------------------------------------------------------
@@ -48,6 +52,8 @@ extern "C" {
 // ----------------------------------------------------------
 
 extern VALUE mWDM;
+
+extern VALUE eWDM_InvalidDirectoryError;
 
 extern ID wdm_rb_sym_call;
 extern ID wdm_rb_sym_at_file;

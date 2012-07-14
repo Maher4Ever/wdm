@@ -116,13 +116,21 @@ rb_monitor_watch(VALUE self, VALUE directory) {
     //
     directory_letters_count = MultiByteToWideChar(CP_UTF8, 0, RSTRING_PTR(os_encoded_directory), -1, NULL, 0);
 
-    entry->user_data->dir = ALLOC_N(WCHAR, directory_letters_count);
+    entry->user_data->dir = ALLOCA_N(WCHAR, directory_letters_count);
+
     MultiByteToWideChar(CP_UTF8, 0, RSTRING_PTR(os_encoded_directory), -1, entry->user_data->dir, directory_letters_count);
 
-    // Internally, use backslashes for all paths because that's the default for Windows.
-    // Although Win32 API doesn't care which one is used, when using the "\\?\" prefix it gets messy!
-    // That's why we stick with backslashes.
-    wdm_utils_convert_forward_to_back_slashes(entry->user_data->dir, directory_letters_count);
+    WDM_WDEBUG("New path to watch: '%s'", entry->user_data->dir);
+
+    entry->user_data->dir = wdm_utils_full_pathname(entry->user_data->dir);
+
+    if ( entry->user_data->dir == 0 ) {
+        rb_raise(rb_eRuntimeError, "Can't get the absolute path for the passed directory: '%s'!", RSTRING_PTR(directory));
+    }
+
+    if ( ! wdm_utils_unicode_is_directory(entry->user_data->dir) ) {
+        rb_raise(eWDM_InvalidDirectoryError, "No such directory: '%s'!", RSTRING_PTR(directory));
+    }
 
     // Tell the GC to collect the tmp string
     rb_str_resize(os_encoded_directory, 0);
@@ -152,7 +160,7 @@ rb_monitor_watch(VALUE self, VALUE directory) {
 
     wdm_monitor_update_head(monitor, entry);
 
-    WDM_WDEBUG("Watching: '%s'", entry->user_data->dir);
+    WDM_WDEBUG("Watching directory: '%s'", entry->user_data->dir);
 
     return Qnil;
 }

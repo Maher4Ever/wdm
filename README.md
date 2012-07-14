@@ -13,8 +13,8 @@ TODO:
 - ~~Provide info about the change in the callback.~~
 - ~~Convert \ to / in paths.~~
 - Don't allow files to be watched when the monitor is running.
-- Check if the passed direcoty exists.
-- Convert passed directories to absolute paths.
+- ~~Check if the passed direcoty exists.~~
+- ~~Convert passed directories to absolute paths.~~
 
 ## Installation
 
