@@ -125,10 +125,12 @@ rb_monitor_watch(VALUE self, VALUE directory) {
     entry->user_data->dir = wdm_utils_full_pathname(entry->user_data->dir);
 
     if ( entry->user_data->dir == 0 ) {
+        wdm_entry_free(entry);
         rb_raise(rb_eRuntimeError, "Can't get the absolute path for the passed directory: '%s'!", RSTRING_PTR(directory));
     }
 
     if ( ! wdm_utils_unicode_is_directory(entry->user_data->dir) ) {
+        wdm_entry_free(entry);
         rb_raise(eWDM_InvalidDirectoryError, "No such directory: '%s'!", RSTRING_PTR(directory));
     }
 
@@ -149,6 +151,7 @@ rb_monitor_watch(VALUE self, VALUE directory) {
     );
 
     if ( entry->dir_handle ==  INVALID_HANDLE_VALUE ) {
+        wdm_entry_free(entry);
         rb_raise(rb_eRuntimeError, "Can't watch directory: '%s'!", RSTRING_PTR(directory));
     }
 
