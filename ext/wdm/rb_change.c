@@ -93,6 +93,9 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
             absolute_filepath_len = wcslen(absolute_filepath);
             WDM_WDEBUG("Short path converted to long: '%s'", absolute_filepath);
         }
+        else {
+            WDM_DEBUG("Can't convert short path to long: '%s'", rb_w32_strerror(GetLastError()));
+        }
     }
 
     // The convention in Ruby is to use forward-slashes to seprarate dirs on all platforms.
