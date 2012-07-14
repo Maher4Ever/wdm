@@ -10,7 +10,11 @@ TODO:
 
 - Fix all the TODO's in the source.
 - Add options to the `watch` method.
-- Provide info about the change in the callback.
+- ~~Provide info about the change in the callback.~~
+- ~~Convert \ to / in paths.~~
+- Don't allow files to be watched when the monitor is running.
+- Check if the passed direcoty exists.
+- Convert passed directories to absolute paths.
 
 ## Installation
 
