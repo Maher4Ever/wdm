@@ -39,6 +39,12 @@ wdm_queue_new() {
     queue->front = NULL;
     queue->rear  = NULL;
 
+    if ( ! InitializeCriticalSectionAndSpinCount(&queue->lock,
+            0x00000400) ) // TODO: look into the best value for spinning.
+    {
+        rb_raise(rb_eRuntimeError, "Can't create a lock for the queue");
+    }
+
     return queue;
 }
 
@@ -50,6 +56,8 @@ wdm_queue_free(WDM_PQueue queue) {
 
 void
 wdm_queue_enqueue(WDM_PQueue queue, WDM_PQueueItem item) {
+    EnterCriticalSection(&queue->lock);
+
     if ( queue->rear == NULL && queue->front == NULL )  {
         queue->front = queue->rear = item;
     }
@@ -58,11 +66,15 @@ wdm_queue_enqueue(WDM_PQueue queue, WDM_PQueueItem item) {
         item->previous = queue->rear;
         queue->rear = item;
     }
+
+    LeaveCriticalSection(&queue->lock);
 }
 
 WDM_PQueueItem
 wdm_queue_dequeue(WDM_PQueue queue) {
     WDM_PQueueItem item;
+
+    EnterCriticalSection(&queue->lock);
 
     if ( queue->rear == NULL && queue->front == NULL ) {
         item = NULL;
@@ -77,6 +89,8 @@ wdm_queue_dequeue(WDM_PQueue queue) {
         // Don't allow the user to mess with the queue
         item->previous = item->next = NULL;
     }
+
+    LeaveCriticalSection(&queue->lock);
 
     return item;
 }

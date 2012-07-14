@@ -21,6 +21,7 @@ typedef struct WDM_QueueItem {
 } WDM_QueueItem, *WDM_PQueueItem;
 
 typedef struct WDM_Queue {
+    CRITICAL_SECTION lock;
     WDM_PQueueItem front;
     WDM_PQueueItem rear;
 } WDM_Queue, *WDM_PQueue;
