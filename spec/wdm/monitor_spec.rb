@@ -76,6 +76,14 @@ describe WDM::Monitor do
     end
   end
 
+  it 'marks changed files as tainted' do
+    result = run_with_fixture(subject) do
+      touch 'file.txt'
+    end
+
+    result.change.file.should be_tainted
+  end
+
   it 'reports changes with ruby path separators (/) even when passed the ones for windows (\)' do
     fixture do |dir|
 

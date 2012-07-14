@@ -40,6 +40,7 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
     DWORD filename_len, absolute_filepath_len;
     LPSTR multibyte_filepath;
     int multibyte_filepath_buffer_size;
+    VALUE path;
 
     filename_len = info->FileNameLength/sizeof(WCHAR);
 
@@ -111,9 +112,13 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
 
     WDM_DEBUG("will report change in: '%s'",  multibyte_filepath);
 
-    return rb_enc_str_new(multibyte_filepath,
+    path = rb_enc_str_new(multibyte_filepath,
         multibyte_filepath_buffer_size - 1, // -1 because this func takes the chars count, not bytes count
         wdm_rb_enc_utf8);
+
+    OBJ_TAINT(path);
+
+    return path;
 }
 
 static VALUE
