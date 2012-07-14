@@ -1,9 +1,11 @@
 ﻿#include "wdm.h"
 
+#include "utils.h"
 #include "entry.h"
 #include "queue.h"
 #include "monitor.h"
 
+#include "rb_change.h"
 #include "rb_monitor.h"
 
 // ----------------------------------------------------------
@@ -75,7 +77,10 @@ monitor_free(LPVOID param) {
 
 static VALUE
 rb_monitor_alloc(VALUE self) {
+    WDM_DEBUG("--------------------------------");
     WDM_DEBUG("Allocating a new monitor object!");
+    WDM_DEBUG("--------------------------------");
+
     return Data_Wrap_Struct(self, monitor_mark, monitor_free, wdm_monitor_new());
 }
 
@@ -113,6 +118,11 @@ rb_monitor_watch(VALUE self, VALUE directory) {
 
     entry->user_data->dir = ALLOC_N(WCHAR, directory_letters_count);
     MultiByteToWideChar(CP_UTF8, 0, RSTRING_PTR(os_encoded_directory), -1, entry->user_data->dir, directory_letters_count);
+
+    // Internally, use backslashes for all paths because that's the default for Windows.
+    // Although Win32 API doesn't care which one is used, when using the "\\?\" prefix it gets messy!
+    // That's why we stick with backslashes.
+    wdm_utils_convert_forward_to_back_slashes(entry->user_data->dir, directory_letters_count);
 
     // Tell the GC to collect the tmp string
     rb_str_resize(os_encoded_directory, 0);
@@ -173,7 +183,7 @@ handle_entry_change(
     param = (WDM_PMonitorCallbackParam)event_container->hEvent;
     data_to_process = wdm_queue_item_new();
 
-    WDM_DEBUG("Change detected in '%s'", param->entry->user_data->dir);
+    WDM_WDEBUG("Change detected in '%s'", param->entry->user_data->dir);
 
     data_to_process->user_data = param->entry->user_data;
 
@@ -257,10 +267,35 @@ wait_for_changes(LPVOID param) {
 static void
 process_changes(WDM_PQueue changes) {
     WDM_PQueueItem item;
+    LPBYTE current_info_entry_offset;
+    PFILE_NOTIFY_INFORMATION info;
+    VALUE event;
+
+    WDM_DEBUG("---------------------------");
+    WDM_DEBUG("Process changes");
+    WDM_DEBUG("--------------------------");
 
     while( ! wdm_queue_is_empty(changes) ) {
         item = wdm_queue_dequeue(changes);
-        rb_funcall(item->user_data->callback, wdm_rb_sym_call, 0);
+        current_info_entry_offset = (LPBYTE)item->buffer;
+
+        for(;;) {
+            info = (PFILE_NOTIFY_INFORMATION)current_info_entry_offset;
+            event = wdm_rb_change_new_from_notification(item->user_data->dir, info);
+
+            WDM_DEBUG("---------------------------");
+            WDM_DEBUG("Running user callback");
+            WDM_DEBUG("--------------------------");
+
+            rb_funcall(item->user_data->callback, wdm_rb_sym_call, 1, event);
+
+            WDM_DEBUG("---------------------------");
+
+            if ( ! info->NextEntryOffset ) break;
+
+            current_info_entry_offset += info->NextEntryOffset;
+        }
+
         wdm_queue_item_free(item);
     }
 }
