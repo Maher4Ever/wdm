@@ -77,16 +77,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="entry.h" />
-    <ClInclude Include="global.h" />
     <ClInclude Include="monitor.h" />
     <ClInclude Include="queue.h" />
+    <ClInclude Include="rb_change.h" />
+    <ClInclude Include="rb_monitor.h" />
+    <ClInclude Include="utils.h" />
     <ClInclude Include="wdm.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.c" />
     <ClCompile Include="monitor.c" />
     <ClCompile Include="queue.c" />
+    <ClCompile Include="rb_change.c" />
+    <ClCompile Include="rb_monitor.c" />
+    <ClCompile Include="utils.c" />
     <ClCompile Include="wdm.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="extconf.rb" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
