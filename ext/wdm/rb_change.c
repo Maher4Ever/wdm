@@ -109,7 +109,7 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
 
     if ( 0 == WideCharToMultiByte(CP_UTF8, 0, absolute_filepath, absolute_filepath_len + 1,
             multibyte_filepath, multibyte_filepath_buffer_size, NULL, NULL) ) {
-        rb_raise(rb_eRuntimeError, "Failed to add the change file path to the event!");
+        rb_raise(eWDM_Error, "Failed to add the change file path to the event!");
     }
 
     WDM_DEBUG("will report change in: '%s'",  multibyte_filepath);
@@ -134,7 +134,7 @@ extract_change_type_from_notification(const PFILE_NOTIFY_INFORMATION info) {
     case FILE_ACTION_RENAMED_OLD_NAME: type = wdm_rb_sym_renamed_old_file; break;
     case FILE_ACTION_RENAMED_NEW_NAME: type = wdm_rb_sym_renamed_new_file; break;
     default:
-        rb_raise(rb_eRuntimeError, "Unknown change happened to a file in a watched directory!");
+        rb_raise(eWDM_Error, "Unknown change happened to a file in a watched directory!");
     }
 
 #if WDM_DEBUG_ENABLED // Used to avoid the func call when in release mode

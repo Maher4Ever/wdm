@@ -53,6 +53,7 @@ extern "C" {
 
 extern VALUE mWDM;
 
+extern VALUE eWDM_Error;
 extern VALUE eWDM_InvalidDirectoryError;
 
 extern ID wdm_rb_sym_call;

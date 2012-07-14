@@ -42,7 +42,7 @@ wdm_queue_new() {
     if ( ! InitializeCriticalSectionAndSpinCount(&queue->lock,
             0x00000400) ) // TODO: look into the best value for spinning.
     {
-        rb_raise(rb_eRuntimeError, "Can't create a lock for the queue");
+        rb_raise(eWDM_Error, "Can't create a lock for the queue");
     }
 
     return queue;

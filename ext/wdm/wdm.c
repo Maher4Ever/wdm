@@ -13,6 +13,7 @@
 
 VALUE mWDM;
 
+VALUE eWDM_Error;
 VALUE eWDM_InvalidDirectoryError;
 
 ID wdm_rb_sym_call;
@@ -45,7 +46,8 @@ Init_wdm() {
 
     mWDM = rb_define_module("WDM");
 
-    eWDM_InvalidDirectoryError = rb_define_class_under(mWDM, "InvalidDirectoryError", rb_eStandardError);
+    eWDM_Error = rb_define_class_under(mWDM, "Error", rb_eStandardError);
+    eWDM_InvalidDirectoryError = rb_define_class_under(mWDM, "InvalidDirectoryError", eWDM_Error);
 
     wdm_rb_monitor_init();
     wdm_rb_change_init();

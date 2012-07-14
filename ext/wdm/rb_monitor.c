@@ -126,7 +126,7 @@ rb_monitor_watch(VALUE self, VALUE directory) {
 
     if ( entry->user_data->dir == 0 ) {
         wdm_entry_free(entry);
-        rb_raise(rb_eRuntimeError, "Can't get the absolute path for the passed directory: '%s'!", RSTRING_PTR(directory));
+        rb_raise(eWDM_Error, "Can't get the absolute path for the passed directory: '%s'!", RSTRING_PTR(directory));
     }
 
     if ( ! wdm_utils_unicode_is_directory(entry->user_data->dir) ) {
@@ -152,7 +152,7 @@ rb_monitor_watch(VALUE self, VALUE directory) {
 
     if ( entry->dir_handle ==  INVALID_HANDLE_VALUE ) {
         wdm_entry_free(entry);
-        rb_raise(rb_eRuntimeError, "Can't watch directory: '%s'!", RSTRING_PTR(directory));
+        rb_raise(eWDM_Error, "Can't watch directory: '%s'!", RSTRING_PTR(directory));
     }
 
     Data_Get_Struct(self, WDM_Monitor, monitor);
@@ -388,14 +388,14 @@ rb_monitor_run_bang(VALUE self) {
     );
 
     if ( monitor->monitoring_thread == NULL ) {
-        rb_raise(rb_eRuntimeError, "Can't create a thread for the monitor!");
+        rb_raise(eWDM_Error, "Can't create a thread for the monitor!");
     }
 
     while ( monitor->running ) {
         waiting_succeeded = rb_thread_blocking_region(wait_for_changes, monitor->process_event, stop_monitoring, monitor);
 
         if ( waiting_succeeded == Qfalse ) {
-            rb_raise(rb_eRuntimeError, "Failed while waiting for a change in the watched directories!");
+            rb_raise(eWDM_Error, "Failed while waiting for a change in the watched directories!");
         }
 
         if ( ! monitor->running ) {
@@ -406,7 +406,7 @@ rb_monitor_run_bang(VALUE self) {
         process_changes(monitor->changes);
 
         if ( ! ResetEvent(monitor->process_event) ) {
-            rb_raise(rb_eRuntimeError, "Couldn't reset system events to watch for changes!");
+            rb_raise(eWDM_Error, "Couldn't reset system events to watch for changes!");
         }
     }
 

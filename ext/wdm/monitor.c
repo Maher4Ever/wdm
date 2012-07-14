@@ -24,7 +24,7 @@ wdm_monitor_new() {
     if ( ! InitializeCriticalSectionAndSpinCount(&monitor->lock,
             0x00000400) ) // TODO: look into the best value for spinning.
     {
-        rb_raise(rb_eRuntimeError, "Can't create a lock for the monitor");
+        rb_raise(eWDM_Error, "Can't create a lock for the monitor");
     }
 
     return monitor;
