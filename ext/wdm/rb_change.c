@@ -20,7 +20,7 @@
 
 VALUE cWDM_Change;
 
-static ID wdm_rb_sym_at_file;
+static ID wdm_rb_sym_at_path;
 static ID wdm_rb_sym_at_type;
 static ID wdm_rb_sym_added;
 static ID wdm_rb_sym_modified;
@@ -161,8 +161,8 @@ wdm_rb_change_new_from_notification(const LPWSTR base_dir, const PFILE_NOTIFY_IN
     // Set '@type' to the change type
     rb_ivar_set(change, wdm_rb_sym_at_type, extract_change_type_from_notification(info));
 
-    // Set '@file' to the absolute path of the changed file
-    rb_ivar_set(change, wdm_rb_sym_at_file, extract_absolute_path_from_notification(base_dir, info));
+    // Set '@path' to the absolute path of the changed file/directory
+    rb_ivar_set(change, wdm_rb_sym_at_path, extract_absolute_path_from_notification(base_dir, info));
 
     return change;
 }
@@ -171,7 +171,7 @@ void
 wdm_rb_change_init() {
     WDM_DEBUG("Registering WDM::Event with Ruby!");
 
-    wdm_rb_sym_at_file = rb_intern("@file");
+    wdm_rb_sym_at_path = rb_intern("@path");
     wdm_rb_sym_at_type = rb_intern("@type");
     wdm_rb_sym_added = rb_intern("added");
     wdm_rb_sym_modified = rb_intern("modified");
@@ -181,6 +181,6 @@ wdm_rb_change_init() {
 
     cWDM_Change = rb_define_class_under(mWDM, "Change", rb_cObject);
 
-    rb_define_attr(cWDM_Change, "file", 1, 0);
+    rb_define_attr(cWDM_Change, "path", 1, 0);
     rb_define_attr(cWDM_Change, "type", 1, 0);
 }

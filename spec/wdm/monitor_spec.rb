@@ -71,7 +71,7 @@ describe WDM::Monitor do
         touch 'file.txt'
       end
 
-      result.change.file.should == "#{result.directory}/file.txt"
+      result.change.path.should == "#{result.directory}/file.txt"
       result.change.type.should == :added
     end
 
@@ -83,7 +83,7 @@ describe WDM::Monitor do
           touch 'file.txt'
         end
 
-        result.change.file.should == "#{result.directory}/file.txt"
+        result.change.path.should == "#{result.directory}/file.txt"
         result.change.type.should == :modified
       end
     end
@@ -96,7 +96,7 @@ describe WDM::Monitor do
           rm 'file.txt'
         end
 
-        result.change.file.should == "#{result.directory}/file.txt"
+        result.change.path.should == "#{result.directory}/file.txt"
         result.change.type.should == :removed
       end
     end
@@ -109,20 +109,20 @@ describe WDM::Monitor do
           mv 'file.txt', 'another.txt'
         end
 
-        result.changes[0].change.file.should == "#{result.directory}/file.txt"
+        result.changes[0].change.path.should == "#{result.directory}/file.txt"
         result.changes[0].change.type.should == :renamed_old_file
 
-        result.changes[1].change.file.should == "#{result.directory}/another.txt"
+        result.changes[1].change.path.should == "#{result.directory}/another.txt"
         result.changes[1].change.type.should == :renamed_new_file
       end
     end
 
-    it 'marks changed files as tainted' do
+    it 'marks changed paths as tainted' do
       result = run_with_fixture(subject) do
         touch 'file.txt'
       end
 
-      result.change.file.should be_tainted
+      result.change.path.should be_tainted
     end
 
     it 'reports changes with absolute paths even when passed relative directory to watch' do
@@ -133,7 +133,7 @@ describe WDM::Monitor do
           touch 'file.txt'
         end
 
-        result.change.file.should == "#{dir}/file.txt"
+        result.change.path.should == "#{dir}/file.txt"
       end
     end
 
@@ -147,7 +147,7 @@ describe WDM::Monitor do
           touch 'file.txt'
         end
 
-        result.change.file.should == "#{expected_dir}/file.txt"
+        result.change.path.should == "#{expected_dir}/file.txt"
       end
     end
 
@@ -162,16 +162,16 @@ describe WDM::Monitor do
           touch short_file_name
         end
 
-        result.change.file.should == "#{result.directory}/#{long_file_name}"
+        result.change.path.should == "#{result.directory}/#{long_file_name}"
       end
     end
 
-    it 'uses UTF-8 for the changed files' do
+    it 'uses UTF-8 for the changed paths' do
       result = run_with_fixture(subject) do
         touch 'file.txt'
       end
 
-      result.change.file.encoding.name.should == "UTF-8"
+      result.change.path.encoding.name.should == "UTF-8"
     end
   end
 end
