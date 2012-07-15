@@ -66,54 +66,80 @@ describe WDM::Monitor do
       result.change.should be_instance_of(WDM::Change)
     end
 
-    it 'detects added files' do
-      result = run_with_fixture(subject) do
-        touch 'file.txt'
-      end
-
-      result.change.path.should == "#{result.directory}/file.txt"
-      result.change.type.should == :added
-    end
-
-    it 'detects modified files' do
-      fixture do |dir|
-        touch 'file.txt'
-
-        result = run(subject, dir) do
+    context 'with no flags passed to watch' do
+      it 'detects added files' do
+        result = run_with_fixture(subject) do
           touch 'file.txt'
         end
 
         result.change.path.should == "#{result.directory}/file.txt"
-        result.change.type.should == :modified
+        result.change.type.should == :added
+      end
+
+      it 'detects modified files' do
+        fixture do |dir|
+          touch 'file.txt'
+
+          result = run(subject, dir) do
+            touch 'file.txt'
+          end
+
+          result.change.path.should == "#{result.directory}/file.txt"
+          result.change.type.should == :modified
+        end
+      end
+
+      it 'detects removedd files' do
+        fixture do |dir|
+          touch 'file.txt'
+
+          result = run(subject, dir) do
+            rm 'file.txt'
+          end
+
+          result.change.path.should == "#{result.directory}/file.txt"
+          result.change.type.should == :removed
+        end
+      end
+
+      it 'detects renamed files' do
+        fixture do |dir|
+          touch 'file.txt'
+
+          result = run_and_collect_multiple_changes(subject, 2, dir) do
+            mv 'file.txt', 'another.txt'
+          end
+
+          result.changes[0].change.path.should == "#{result.directory}/file.txt"
+          result.changes[0].change.type.should == :renamed_old_file
+
+          result.changes[1].change.path.should == "#{result.directory}/another.txt"
+          result.changes[1].change.type.should == :renamed_new_file
+        end
       end
     end
 
-    it 'detects removedd files' do
-      fixture do |dir|
-        touch 'file.txt'
-
-        result = run(subject, dir) do
-          rm 'file.txt'
+    context 'with the :directories flag passed to watch' do
+      it 'detects added directories' do
+        result = run_with_fixture(subject, :directories) do
+          mkdir 'new_dir'
         end
 
-        result.change.path.should == "#{result.directory}/file.txt"
-        result.change.type.should == :removed
+        result.change.path.should == "#{result.directory}/new_dir"
+        result.change.type.should == :added
       end
-    end
 
-    it 'detects renamed files' do
-      fixture do |dir|
-        touch 'file.txt'
+      it 'detects removedd directories' do
+        fixture do |dir|
+          mkdir 'new_dir'
 
-        result = run_and_collect_multiple_changes(subject, 2, dir) do
-          mv 'file.txt', 'another.txt'
+          result = run(subject, dir, :directories) do
+            rmdir 'new_dir'
+          end
+
+          result.change.path.should == "#{result.directory}/new_dir"
+          result.change.type.should == :removed
         end
-
-        result.changes[0].change.path.should == "#{result.directory}/file.txt"
-        result.changes[0].change.type.should == :renamed_old_file
-
-        result.changes[1].change.path.should == "#{result.directory}/another.txt"
-        result.changes[1].change.type.should == :renamed_new_file
       end
     end
 

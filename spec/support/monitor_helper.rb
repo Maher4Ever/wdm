@@ -9,13 +9,13 @@ module WDM
     #
     # @yield
     #
-    def run_and_collect_multiple_changes(monitor, times, directory)
+    def run_and_collect_multiple_changes(monitor, times, directory, *flags)
       result = OpenStruct.new(directory: directory, changes: [])
       i = 0
       result.changes[i] = OpenStruct.new(called: false)
       can_return = false
 
-      monitor.watch(directory) do |change|
+      monitor.watch(directory, *flags) do |change|
         next if can_return
 
         result.changes[i].called = true;
@@ -55,8 +55,8 @@ module WDM
     #
     # @yield
     #
-    def run(monitor, directory, &block)
-      result = run_and_collect_multiple_changes(monitor, 1, directory, &block)
+    def run(monitor, directory, *flags, &block)
+      result = run_and_collect_multiple_changes(monitor, 1, directory, *flags, &block)
       result.changes[0].directory = result.directory
       result.changes[0]
     end
@@ -65,9 +65,9 @@ module WDM
     #
     # @yield
     #
-    def run_with_fixture(monitor, &block)
+    def run_with_fixture(monitor, *flags, &block)
       fixture do |f|
-        run(monitor, f, &block)
+        run(monitor, f, *flags, &block)
       end
     end
   end
