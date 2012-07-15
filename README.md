@@ -9,7 +9,9 @@ it yet in anything (unless you are testing it, which is very much appreciated :)
 TODO:
 
 - Fix all the TODO's in the source.
-- Add options to the `watch` method.
+- Append a '/' to reported directories.
+- Enable watching subdirectories.
+- ~~Add options to the `watch` method.~~
 - ~~Provide info about the change in the callback.~~
 - ~~Convert \ to / in paths.~~
 - ~~Don't allow directories to be watched while the monitor is running.~~

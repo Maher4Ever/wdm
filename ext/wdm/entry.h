@@ -16,6 +16,7 @@ typedef struct {
     LPWSTR dir;                             // Name of directory to watch
     VALUE callback;                         // Proc object to call when there are changes
     BOOL watch_childeren;                   // Watch sub-directories
+    DWORD flags;                            // Flags for the type of changes to report
 } WDM_EntryUserData, *WDM_PEntryUserData;
 
 typedef struct WDM_Entry {

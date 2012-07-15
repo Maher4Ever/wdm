@@ -5,11 +5,22 @@
 extern "C" {
 #endif // __cplusplus
 
+// ---------------------------------------------------------
+// Constants
+// ---------------------------------------------------------
+
+#define WDM_MONITOR_FLAGS_DEFAULT       \
+    FILE_NOTIFY_CHANGE_LAST_WRITE       \
+        | FILE_NOTIFY_CHANGE_CREATION   \
+        | FILE_NOTIFY_CHANGE_FILE_NAME
+
 // ----------------------------------------------------------
 // Global variables
 // ----------------------------------------------------------
 
 extern VALUE cWDM_Monitor;
+
+extern VALUE eWDM_UnknownFlagError;
 
 // ---------------------------------------------------------
 // Prototypes

@@ -20,6 +20,18 @@ describe WDM::Monitor do
       }.to raise_error(WDM::InvalidDirectoryError)
     end
 
+    it 'throws an exception when a non-symbol flag is passed' do
+      expect {
+        subject.watch('does not matter', "not a symbol") {}
+      }.to raise_error(TypeError)
+    end
+
+    it 'throws an exception when an unknown flag is passed' do
+      expect {
+        subject.watch('does not matter', :not_a_flag) {}
+      }.to raise_error(WDM::UnknownFlagError)
+    end
+
     it 'throws an exception when it is called while the monitor is running' do
       expect {
         run_with_fixture(subject) do

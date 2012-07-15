@@ -14,6 +14,22 @@
 
 VALUE cWDM_Monitor;
 
+VALUE eWDM_UnknownFlagError;
+
+// ----------------------------------------------------------
+// Cached variables
+// ----------------------------------------------------------
+
+static ID wdm_rb_sym_files;
+static ID wdm_rb_sym_directories;
+static ID wdm_rb_sym_attributes;
+static ID wdm_rb_sym_size;
+static ID wdm_rb_sym_last_write;
+static ID wdm_rb_sym_last_access;
+static ID wdm_rb_sym_creation;
+static ID wdm_rb_sym_security;
+static ID wdm_rb_sym_default;
+
 // ---------------------------------------------------------
 // Prototypes of static functions
 // ---------------------------------------------------------
@@ -22,7 +38,9 @@ static void monitor_mark(LPVOID);
 static void monitor_free(LPVOID);
 static VALUE rb_monitor_alloc(VALUE);
 
-static VALUE rb_monitor_watch(VALUE, VALUE);
+static DWORD id_to_flag(ID);
+static DWORD extract_flags_from_rb_array(VALUE);
+static VALUE rb_monitor_watch(int, VALUE*, VALUE);
 
 static void CALLBACK handle_entry_change(DWORD, DWORD, LPOVERLAPPED);
 static void register_monitoring_entry(WDM_PEntry);
@@ -84,15 +102,46 @@ rb_monitor_alloc(VALUE self) {
     return Data_Wrap_Struct(self, monitor_mark, monitor_free, wdm_monitor_new());
 }
 
+static DWORD
+id_to_flag(ID id) {
+    if ( id == wdm_rb_sym_default ) return WDM_MONITOR_FLAGS_DEFAULT;
+
+    // TODO: Maybe reorder the if's in the frequentie of use for better performance?
+    if ( id == wdm_rb_sym_files ) return FILE_NOTIFY_CHANGE_FILE_NAME;
+    if ( id == wdm_rb_sym_directories ) return FILE_NOTIFY_CHANGE_DIR_NAME;
+    if ( id == wdm_rb_sym_attributes ) return FILE_NOTIFY_CHANGE_ATTRIBUTES;
+    if ( id == wdm_rb_sym_size ) return FILE_NOTIFY_CHANGE_SIZE;
+    if ( id == wdm_rb_sym_last_write ) return FILE_NOTIFY_CHANGE_LAST_WRITE;
+    if ( id == wdm_rb_sym_last_access ) return FILE_NOTIFY_CHANGE_LAST_ACCESS;
+    if ( id == wdm_rb_sym_creation ) return FILE_NOTIFY_CHANGE_CREATION;
+    if ( id == wdm_rb_sym_security ) return FILE_NOTIFY_CHANGE_SECURITY;
+
+    rb_raise(eWDM_UnknownFlagError, "Unknown watch flag: ':%s'", rb_id2name(id));
+}
+
+static DWORD
+extract_flags_from_rb_array(VALUE flags_array) {
+    VALUE flag_symbol;
+    DWORD flags;
+
+    flags = 0;
+
+    while ( RARRAY_LEN(flags_array) != 0 ) {
+        flag_symbol = rb_ary_pop(flags_array);
+        Check_Type(flag_symbol, T_SYMBOL);
+        flags |= id_to_flag( SYM2ID(flag_symbol) );
+    }
+
+    return flags;
+}
+
 static VALUE
-rb_monitor_watch(VALUE self, VALUE directory) {
+rb_monitor_watch(int argc, VALUE *argv, VALUE self) {
     WDM_PMonitor monitor;
     WDM_PEntry entry;
     int directory_letters_count;
-    VALUE os_encoded_directory;
+    VALUE directory, flags, os_encoded_directory;
     BOOL running;
-
-    Check_Type(directory, T_STRING);
 
     // TODO: Maybe raise a more user-friendly error?
     rb_need_block();
@@ -107,8 +156,13 @@ rb_monitor_watch(VALUE self, VALUE directory) {
         rb_raise(eWDM_MonitorRunningError, "You can't watch new directories while the monitor is running!");
     }
 
+    rb_scan_args(argc, argv, "1*", &directory, &flags);
+
+    Check_Type(directory, T_STRING);
+
     entry = wdm_entry_new();
     entry->user_data->callback =  rb_block_proc();
+    entry->user_data->flags = RARRAY_LEN(flags) == 0 ? WDM_MONITOR_FLAGS_DEFAULT : extract_flags_from_rb_array(flags);
 
     // WTF Ruby source: The original code (file.c) uses the following macro to make sure that the encoding
     // of the string is ASCII-compatible, but UTF-16LE (Windows default encoding) is not!!!
@@ -233,9 +287,7 @@ register_monitoring_entry(WDM_PEntry entry) {
         entry->buffer,                      // read results buffer
         WDM_BUFFER_SIZE,                    // length of buffer
         entry->user_data->watch_childeren,  // monitoring option
-        FILE_NOTIFY_CHANGE_LAST_WRITE       // filter conditions
-            | FILE_NOTIFY_CHANGE_CREATION
-            | FILE_NOTIFY_CHANGE_FILE_NAME,
+        entry->user_data->flags,            // filter conditions
         &bytes,                             // bytes returned
         &entry->event_container,            // overlapped buffer
         &handle_entry_change                // process callback
@@ -439,10 +491,22 @@ void
 wdm_rb_monitor_init() {
     WDM_DEBUG("Registering WDM::Monitor with Ruby!");
 
+    wdm_rb_sym_files = rb_intern("files");
+    wdm_rb_sym_directories = rb_intern("directories");
+    wdm_rb_sym_attributes = rb_intern("attributes");
+    wdm_rb_sym_size = rb_intern("size");
+    wdm_rb_sym_last_write = rb_intern("last_write");
+    wdm_rb_sym_last_access = rb_intern("last_access");
+    wdm_rb_sym_creation = rb_intern("creation");
+    wdm_rb_sym_security = rb_intern("security");
+    wdm_rb_sym_default = rb_intern("default");
+
+    eWDM_UnknownFlagError = rb_define_class_under(mWDM, "UnknownFlagError", eWDM_Error);
+
     cWDM_Monitor = rb_define_class_under(mWDM, "Monitor", rb_cObject);
 
     rb_define_alloc_func(cWDM_Monitor, rb_monitor_alloc);
-    rb_define_method(cWDM_Monitor, "watch", RUBY_METHOD_FUNC(rb_monitor_watch), 1);
+    rb_define_method(cWDM_Monitor, "watch", RUBY_METHOD_FUNC(rb_monitor_watch), -1);
     rb_define_method(cWDM_Monitor, "run!", RUBY_METHOD_FUNC(rb_monitor_run_bang), 0);
     rb_define_method(cWDM_Monitor, "stop", RUBY_METHOD_FUNC(rb_monitor_stop), 0);
 }
