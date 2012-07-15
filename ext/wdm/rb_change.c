@@ -107,7 +107,7 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
     }
 
     // The convention in Ruby is to use forward-slashes to seprarate dirs on all platforms.
-    wdm_utils_convert_back_to_forward_slashes(absolute_filepath, absolute_filepath_len);
+    wdm_utils_convert_back_to_forward_slashes(absolute_filepath, absolute_filepath_len + 1);
 
     // Convert the path from WCHAR to multibyte CHAR to use it in a ruby string
     multibyte_filepath_buffer_size =
