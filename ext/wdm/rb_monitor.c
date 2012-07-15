@@ -90,11 +90,22 @@ rb_monitor_watch(VALUE self, VALUE directory) {
     WDM_PEntry entry;
     int directory_letters_count;
     VALUE os_encoded_directory;
+    BOOL running;
 
     Check_Type(directory, T_STRING);
 
     // TODO: Maybe raise a more user-friendly error?
     rb_need_block();
+
+    Data_Get_Struct(self, WDM_Monitor, monitor);
+
+    EnterCriticalSection(&monitor->lock);
+        running = monitor->running;
+    LeaveCriticalSection(&monitor->lock);
+
+    if ( running ) {
+        rb_raise(eWDM_MonitorRunningError, "You can't watch new directories while the monitor is running!");
+    }
 
     entry = wdm_entry_new();
     entry->user_data->callback =  rb_block_proc();
@@ -154,8 +165,6 @@ rb_monitor_watch(VALUE self, VALUE directory) {
         wdm_entry_free(entry);
         rb_raise(eWDM_Error, "Can't watch directory: '%s'!", RSTRING_PTR(directory));
     }
-
-    Data_Get_Struct(self, WDM_Monitor, monitor);
 
     // Store a reference to the entry instead of an event as the event
     // won't be used when using callbacks.

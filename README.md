@@ -12,7 +12,7 @@ TODO:
 - Add options to the `watch` method.
 - ~~Provide info about the change in the callback.~~
 - ~~Convert \ to / in paths.~~
-- Don't allow files to be watched when the monitor is running.
+- ~~Don't allow directories to be watched while the monitor is running.~~
 - ~~Check if the passed direcoty exists.~~
 - ~~Convert passed directories to absolute paths.~~
 

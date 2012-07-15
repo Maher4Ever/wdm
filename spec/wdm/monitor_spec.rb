@@ -19,6 +19,14 @@ describe WDM::Monitor do
         subject.watch(__FILE__) {}
       }.to raise_error(WDM::InvalidDirectoryError)
     end
+
+    it 'throws an exception when it is called while the monitor is running' do
+      expect {
+        run_with_fixture(subject) do
+          subject.watch('does not matter') {}
+        end
+      }.to raise_error(WDM::MonitorRunningError)
+    end
   end
 
   describe 'run!' do
