@@ -21,6 +21,8 @@ extern "C" {
 extern VALUE cWDM_Monitor;
 
 extern VALUE eWDM_UnknownFlagError;
+extern VALUE eWDM_MonitorRunningError;
+extern VALUE eWDM_InvalidDirectoryError;
 
 // ---------------------------------------------------------
 // Prototypes

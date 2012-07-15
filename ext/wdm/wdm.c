@@ -34,22 +34,11 @@ void
 Init_wdm() {
     WDM_DEBUG("Registering WDM with Ruby!");
 
-    wdm_rb_sym_call = rb_intern("call");
-    wdm_rb_sym_at_file = rb_intern("@file");
-    wdm_rb_sym_at_type = rb_intern("@type");
-    wdm_rb_sym_added = rb_intern("added");
-    wdm_rb_sym_modified = rb_intern("modified");
-    wdm_rb_sym_removed = rb_intern("removed");
-    wdm_rb_sym_renamed_old_file = rb_intern("renamed_old_file");
-    wdm_rb_sym_renamed_new_file = rb_intern("renamed_new_file");
-
     wdm_rb_enc_utf8 = rb_utf8_encoding();
 
     mWDM = rb_define_module("WDM");
 
     eWDM_Error = rb_define_class_under(mWDM, "Error", rb_eStandardError);
-    eWDM_MonitorRunningError = rb_define_class_under(mWDM, "MonitorRunningError", eWDM_Error);
-    eWDM_InvalidDirectoryError = rb_define_class_under(mWDM, "InvalidDirectoryError", eWDM_Error);
 
     wdm_rb_monitor_init();
     wdm_rb_change_init();

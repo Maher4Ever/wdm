@@ -20,6 +20,14 @@
 
 VALUE cWDM_Change;
 
+static ID wdm_rb_sym_at_file;
+static ID wdm_rb_sym_at_type;
+static ID wdm_rb_sym_added;
+static ID wdm_rb_sym_modified;
+static ID wdm_rb_sym_removed;
+static ID wdm_rb_sym_renamed_old_file;
+static ID wdm_rb_sym_renamed_new_file;
+
 // ----------------------------------------------------------
 // Prototypes of static functions
 // ----------------------------------------------------------
@@ -162,6 +170,14 @@ wdm_rb_change_new_from_notification(const LPWSTR base_dir, const PFILE_NOTIFY_IN
 void
 wdm_rb_change_init() {
     WDM_DEBUG("Registering WDM::Event with Ruby!");
+
+    wdm_rb_sym_at_file = rb_intern("@file");
+    wdm_rb_sym_at_type = rb_intern("@type");
+    wdm_rb_sym_added = rb_intern("added");
+    wdm_rb_sym_modified = rb_intern("modified");
+    wdm_rb_sym_removed = rb_intern("removed");
+    wdm_rb_sym_renamed_old_file = rb_intern("renamed_old_file");
+    wdm_rb_sym_renamed_new_file = rb_intern("renamed_new_file");
 
     cWDM_Change = rb_define_class_under(mWDM, "Change", rb_cObject);
 

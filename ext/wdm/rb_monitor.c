@@ -20,6 +20,7 @@ VALUE eWDM_UnknownFlagError;
 // Cached variables
 // ----------------------------------------------------------
 
+static ID wdm_rb_sym_call;
 static ID wdm_rb_sym_files;
 static ID wdm_rb_sym_directories;
 static ID wdm_rb_sym_attributes;
@@ -491,6 +492,7 @@ void
 wdm_rb_monitor_init() {
     WDM_DEBUG("Registering WDM::Monitor with Ruby!");
 
+    wdm_rb_sym_call = rb_intern("call");
     wdm_rb_sym_files = rb_intern("files");
     wdm_rb_sym_directories = rb_intern("directories");
     wdm_rb_sym_attributes = rb_intern("attributes");
@@ -501,6 +503,8 @@ wdm_rb_monitor_init() {
     wdm_rb_sym_security = rb_intern("security");
     wdm_rb_sym_default = rb_intern("default");
 
+    eWDM_MonitorRunningError = rb_define_class_under(mWDM, "MonitorRunningError", eWDM_Error);
+    eWDM_InvalidDirectoryError = rb_define_class_under(mWDM, "InvalidDirectoryError", eWDM_Error);
     eWDM_UnknownFlagError = rb_define_class_under(mWDM, "UnknownFlagError", eWDM_Error);
 
     cWDM_Monitor = rb_define_class_under(mWDM, "Monitor", rb_cObject);

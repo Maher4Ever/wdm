@@ -54,17 +54,6 @@ extern "C" {
 extern VALUE mWDM;
 
 extern VALUE eWDM_Error;
-extern VALUE eWDM_MonitorRunningError;
-extern VALUE eWDM_InvalidDirectoryError;
-
-extern ID wdm_rb_sym_call;
-extern ID wdm_rb_sym_at_file;
-extern ID wdm_rb_sym_at_type;
-extern ID wdm_rb_sym_added;
-extern ID wdm_rb_sym_modified;
-extern ID wdm_rb_sym_removed;
-extern ID wdm_rb_sym_renamed_old_file;
-extern ID wdm_rb_sym_renamed_new_file;
 
 extern rb_encoding *wdm_rb_enc_utf8;
 
