@@ -22,15 +22,20 @@ wdm_utils_full_pathname(const LPWSTR path) {
     WCHAR maxed_path[WDM_MAX_WCHAR_LONG_PATH];
     LPWSTR full_path;
     size_t full_path_len;
+    BOOL is_directory;
 
     if ( GetFullPathNameW(path, WDM_MAX_WCHAR_LONG_PATH, maxed_path, NULL) == 0 ) {
         return 0;
     }
 
+    is_directory = wdm_utils_unicode_is_directory(maxed_path);
+
     full_path_len = wcslen(maxed_path);
-    full_path = ALLOC_N(WCHAR, full_path_len + 1);
+    full_path = ALLOC_N(WCHAR, full_path_len + (is_directory ? 2 : 1)); // When it's a directory, add extra 1 for the (\) at the end
 
     wcscpy(full_path, maxed_path);
+
+    if ( is_directory ) wcscat(full_path, L"\\");
 
     return full_path;
 }
