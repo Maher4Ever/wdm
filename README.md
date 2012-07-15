@@ -9,7 +9,6 @@ it yet in anything (unless you are testing it, which is very much appreciated :)
 TODO:
 
 - Fix all the TODO's in the source.
-- Append a '/' to reported directories.
 - Enable watching subdirectories.
 - ~~Add options to the `watch` method.~~
 - ~~Provide info about the change in the callback.~~
