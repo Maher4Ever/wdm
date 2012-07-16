@@ -41,7 +41,10 @@ static VALUE rb_monitor_alloc(VALUE);
 
 static DWORD id_to_flag(ID);
 static DWORD extract_flags_from_rb_array(VALUE);
+static VALUE combined_watch(BOOL, int, VALUE*, VALUE);
 static VALUE rb_monitor_watch(int, VALUE*, VALUE);
+
+static VALUE rb_monitor_watch_recursively(int, VALUE*, VALUE);
 
 static void CALLBACK handle_entry_change(DWORD, DWORD, LPOVERLAPPED);
 static void register_monitoring_entry(WDM_PEntry);
@@ -137,7 +140,7 @@ extract_flags_from_rb_array(VALUE flags_array) {
 }
 
 static VALUE
-rb_monitor_watch(int argc, VALUE *argv, VALUE self) {
+combined_watch(BOOL recursively, int argc, VALUE *argv, VALUE self) {
     WDM_PMonitor monitor;
     WDM_PEntry entry;
     int directory_letters_count;
@@ -162,6 +165,7 @@ rb_monitor_watch(int argc, VALUE *argv, VALUE self) {
     Check_Type(directory, T_STRING);
 
     entry = wdm_entry_new();
+    entry->user_data->watch_childeren = recursively;
     entry->user_data->callback =  rb_block_proc();
     entry->user_data->flags = RARRAY_LEN(flags) == 0 ? WDM_MONITOR_FLAGS_DEFAULT : extract_flags_from_rb_array(flags);
 
@@ -230,6 +234,16 @@ rb_monitor_watch(int argc, VALUE *argv, VALUE self) {
     WDM_WDEBUG("Watching directory: '%s'", entry->user_data->dir);
 
     return Qnil;
+}
+
+static VALUE
+rb_monitor_watch(int argc, VALUE *argv, VALUE self) {
+    return combined_watch(FALSE, argc, argv, self);
+}
+
+static VALUE
+rb_monitor_watch_recursively(int argc, VALUE *argv, VALUE self) {
+    return combined_watch(TRUE, argc, argv, self);
 }
 
 static void CALLBACK
@@ -511,6 +525,7 @@ wdm_rb_monitor_init() {
 
     rb_define_alloc_func(cWDM_Monitor, rb_monitor_alloc);
     rb_define_method(cWDM_Monitor, "watch", RUBY_METHOD_FUNC(rb_monitor_watch), -1);
+    rb_define_method(cWDM_Monitor, "watch_recursively", RUBY_METHOD_FUNC(rb_monitor_watch_recursively), -1);
     rb_define_method(cWDM_Monitor, "run!", RUBY_METHOD_FUNC(rb_monitor_run_bang), 0);
     rb_define_method(cWDM_Monitor, "stop", RUBY_METHOD_FUNC(rb_monitor_stop), 0);
 }

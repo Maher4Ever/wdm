@@ -9,13 +9,71 @@ module WDM
     #
     # @yield
     #
-    def run_and_collect_multiple_changes(monitor, times, directory, *flags)
+    def run_and_collect_multiple_changes(monitor, times, directory, *flags, &block)
+      watch_and_run(monitor, times, false, directory, *flags, &block)
+    end
+
+    # Helper method for running the monitor one time.
+    #
+    # @yield
+    #
+    def run(monitor, directory, *flags, &block)
+      result = watch_and_run(monitor, 1, false, directory, *flags, &block)
+      result.changes[0].directory = result.directory
+      result.changes[0]
+    end
+
+    # Helper method for using the run method with the fixture helper.
+    #
+    # @yield
+    #
+    def run_with_fixture(monitor, *flags, &block)
+      fixture do |f|
+        run(monitor, f, *flags, &block)
+      end
+    end
+
+    # Runs the monitor recursively and collects changes for the specified amount of times
+    # on the given directory. It stops the monitor afterwards.
+    #
+    # @yield
+    #
+    def run_recursively_and_collect_multiple_changes(monitor, times, directory, *flags, &block)
+      watch_and_run(monitor, times, true, directory, *flags, &block)
+    end
+
+    # Helper method for running the monitor recursively one time.
+    #
+    # @yield
+    #
+    def run_recursively(monitor, directory, *flags, &block)
+      result = watch_and_run(monitor, 1, true, directory, *flags, &block)
+      result.changes[0].directory = result.directory
+      result.changes[0]
+    end
+
+    # Helper method for using the run method recursively with the fixture helper.
+    #
+    # @yield
+    #
+    def run_recursively_with_fixture(monitor, *flags, &block)
+      fixture do |f|
+        run_recursively(monitor, f, *flags, &block)
+      end
+    end
+
+  private
+
+    # Very customizable method to watch directories and then run the monitor
+    #
+    # @yield
+    #
+    def watch_and_run(monitor, times, recursively, directory, *flags)
       result = OpenStruct.new(directory: directory, changes: [])
       i = 0
       result.changes[i] = OpenStruct.new(called: false)
       can_return = false
-
-      monitor.watch(directory, *flags) do |change|
+      callback = Proc.new do |change|
         next if can_return
 
         result.changes[i].called = true;
@@ -28,6 +86,12 @@ module WDM
         else
           can_return = true
         end
+      end
+
+      if recursively
+        monitor.watch_recursively(directory, *flags, &callback)
+      else
+        monitor.watch(directory, *flags, &callback)
       end
 
       thread = Thread.new(monitor) { |m| m.run! }
@@ -49,26 +113,6 @@ module WDM
     ensure
       monitor.stop
       thread.join if thread
-    end
-
-    # Helper method for running the monitor one time.
-    #
-    # @yield
-    #
-    def run(monitor, directory, *flags, &block)
-      result = run_and_collect_multiple_changes(monitor, 1, directory, *flags, &block)
-      result.changes[0].directory = result.directory
-      result.changes[0]
-    end
-
-    # Helper method for using the run method with the fixture helper.
-    #
-    # @yield
-    #
-    def run_with_fixture(monitor, *flags, &block)
-      fixture do |f|
-        run(monitor, f, *flags, &block)
-      end
     end
   end
 end

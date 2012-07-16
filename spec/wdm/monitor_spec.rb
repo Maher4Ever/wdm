@@ -1,44 +1,56 @@
 require 'spec_helper'
 
+shared_examples_for :watch_method do
+  it 'throws an exception when no block is given' do
+    expect {
+      watch_method.call('does not matter')
+    }.to raise_error(LocalJumpError, 'no block given')
+  end
+
+  it 'throws an exception when the passed directory does not exist' do
+    expect {
+      watch_method.call('nonexistent_directory') {}
+    }.to raise_error(WDM::InvalidDirectoryError)
+  end
+
+  it 'throws an exception when the passed directory is a file' do
+    expect {
+      watch_method.call(__FILE__) {}
+    }.to raise_error(WDM::InvalidDirectoryError)
+  end
+
+  it 'throws an exception when a non-symbol flag is passed' do
+    expect {
+      watch_method.call('does not matter', "not a symbol") {}
+    }.to raise_error(TypeError)
+  end
+
+  it 'throws an exception when an unknown flag is passed' do
+    expect {
+      watch_method.call('does not matter', :not_a_flag) {}
+    }.to raise_error(WDM::UnknownFlagError)
+  end
+
+  it 'throws an exception when it is called while the monitor is running' do
+    expect {
+      run_with_fixture(subject) do
+        watch_method.call('does not matter') {}
+      end
+    }.to raise_error(WDM::MonitorRunningError)
+  end
+end
+
 describe WDM::Monitor do
   describe '#watch' do
-    it 'throws an exception when no block is given' do
-      expect {
-        subject.watch('does not matter')
-      }.to raise_error(LocalJumpError, 'no block given')
-    end
+    let(:watch_method) { Proc.new { |*args, &block| subject.watch(*args, &block) } }
 
-    it 'throws an exception when the passed directory does not exist' do
-      expect {
-        subject.watch('nonexistent_directory') {}
-      }.to raise_error(WDM::InvalidDirectoryError)
-    end
+    it_should_behave_like :watch_method
+  end
 
-    it 'throws an exception when the passed directory is a file' do
-      expect {
-        subject.watch(__FILE__) {}
-      }.to raise_error(WDM::InvalidDirectoryError)
-    end
+  describe '#watch_recursively' do
+    let(:watch_method) { Proc.new { |*args, &block| subject.watch_recursively(*args, &block) } }
 
-    it 'throws an exception when a non-symbol flag is passed' do
-      expect {
-        subject.watch('does not matter', "not a symbol") {}
-      }.to raise_error(TypeError)
-    end
-
-    it 'throws an exception when an unknown flag is passed' do
-      expect {
-        subject.watch('does not matter', :not_a_flag) {}
-      }.to raise_error(WDM::UnknownFlagError)
-    end
-
-    it 'throws an exception when it is called while the monitor is running' do
-      expect {
-        run_with_fixture(subject) do
-          subject.watch('does not matter') {}
-        end
-      }.to raise_error(WDM::MonitorRunningError)
-    end
+    it_should_behave_like :watch_method
   end
 
   describe 'run!' do
@@ -139,6 +151,21 @@ describe WDM::Monitor do
 
           result.change.path.should == "#{result.directory}/new_dir"
           result.change.type.should == :removed
+        end
+      end
+    end
+
+    context 'when directories are registered with (watch_recursively)' do
+      it 'detects changes in subdirectories' do
+        fixture do |dir|
+          mkdir 'some_dir'
+
+          result = run_recursively(subject, dir) do
+            touch 'some_dir/file.txt'
+          end
+
+        result.change.path.should == "#{result.directory}/some_dir/file.txt"
+        result.change.type.should == :added
         end
       end
     end
