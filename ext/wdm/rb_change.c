@@ -61,12 +61,11 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
 
     WDM_WDEBUG("change in: '%s'", buffer);
 
-    absolute_filepath_len = wcslen(base_dir) + 1 + filename_len;
+    absolute_filepath_len = wcslen(base_dir) + filename_len;
     absolute_filepath = ALLOCA_N(WCHAR, absolute_filepath_len + 1); // 1 for NULL
     absolute_filepath[0] = L'\0';
 
     wcscat(absolute_filepath, base_dir);
-    wcscat(absolute_filepath, L"\\");
     wcscat(absolute_filepath, buffer);
 
     WDM_WDEBUG("absolute path is: '%s'", absolute_filepath);
