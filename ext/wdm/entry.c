@@ -1,5 +1,6 @@
 #include "wdm.h"
 
+#include "memory.h"
 #include "entry.h"
 
 // ---------------------------------------------------------
@@ -10,7 +11,7 @@ WDM_PEntryUserData
 wdm_entry_user_data_new() {
     WDM_PEntryUserData user_data;
 
-    user_data = ALLOC(WDM_EntryUserData);
+    user_data = WDM_ALLOC(WDM_EntryUserData);
 
     user_data->dir = NULL;
     user_data->watch_childeren = FALSE;
@@ -20,8 +21,8 @@ wdm_entry_user_data_new() {
 
 void
 wdm_entry_user_data_free(WDM_PEntryUserData user_data) {
-    if ( user_data->dir != NULL ) xfree(user_data->dir);
-    xfree(user_data);
+    if ( user_data->dir != NULL ) free(user_data->dir);
+    free(user_data);
 }
 
 // ---------------------------------------------------------
@@ -32,7 +33,7 @@ WDM_PEntry
 wdm_entry_new() {
     WDM_PEntry entry;
 
-    entry = ALLOC(WDM_Entry);
+    entry = WDM_ALLOC(WDM_Entry);
 
     entry->user_data = wdm_entry_user_data_new();
     entry->dir_handle = INVALID_HANDLE_VALUE;
@@ -51,7 +52,7 @@ wdm_entry_free(WDM_PEntry entry) {
         CloseHandle(entry->dir_handle);
     }
     wdm_entry_user_data_free(entry->user_data);
-    xfree(entry);
+    free(entry);
 }
 
 void

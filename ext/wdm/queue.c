@@ -1,5 +1,6 @@
 #include "wdm.h"
 
+#include "memory.h"
 #include "queue.h"
 
 // ---------------------------------------------------------
@@ -10,7 +11,7 @@ WDM_PQueueItem
 wdm_queue_item_new() {
     WDM_PQueueItem item;
 
-    item = ALLOC(WDM_QueueItem);
+    item = WDM_ALLOC(WDM_QueueItem);
     item->user_data = NULL;
     item->previous    = NULL;
     item->next        = NULL;
@@ -24,7 +25,7 @@ void
 wdm_queue_item_free(WDM_PQueueItem item) {
     // We can't really do anything to the prev pointer nor the next pointer,
     // because we might break any linking the user has established.
-    xfree(item);
+    free(item);
 }
 
 // ---------------------------------------------------------
@@ -35,7 +36,7 @@ WDM_PQueue
 wdm_queue_new() {
     WDM_PQueue queue;
 
-    queue = ALLOC(WDM_Queue);
+    queue = WDM_ALLOC(WDM_Queue);
     queue->front = NULL;
     queue->rear  = NULL;
 
@@ -51,7 +52,7 @@ wdm_queue_new() {
 void
 wdm_queue_free(WDM_PQueue queue) {
     wdm_queue_empty(queue);
-    xfree(queue);
+    free(queue);
 }
 
 void

@@ -1,5 +1,6 @@
 #include "wdm.h"
 
+#include "memory.h"
 #include "entry.h"
 #include "queue.h"
 
@@ -9,7 +10,7 @@ WDM_PMonitor
 wdm_monitor_new() {
     WDM_PMonitor monitor;
 
-    monitor = ALLOC(WDM_Monitor);
+    monitor = WDM_ALLOC(WDM_Monitor);
 
     monitor->running = FALSE;
 
@@ -40,7 +41,7 @@ wdm_monitor_free(WDM_PMonitor monitor) {
     CloseHandle(monitor->process_event); // TODO: Look into why this crashes the app when exiting!
     CloseHandle(monitor->stop_event);
 
-    xfree(monitor);
+    free(monitor);
 }
 
 void
@@ -55,7 +56,7 @@ WDM_PMonitorCallbackParam
 wdm_monitor_callback_param_new(WDM_PMonitor monitor, WDM_PEntry entry) {
     WDM_PMonitorCallbackParam param;
 
-    param = ALLOC(WDM_MonitorCallbackParam);
+    param = WDM_ALLOC(WDM_MonitorCallbackParam);
 
     param->monitor = monitor;
     param->entry = entry;
@@ -65,5 +66,5 @@ wdm_monitor_callback_param_new(WDM_PMonitor monitor, WDM_PEntry entry) {
 
 void
 wdm_monitor_callback_param_free(WDM_PMonitorCallbackParam param) {
-    xfree(param);
+    free(param);
 }

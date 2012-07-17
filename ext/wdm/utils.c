@@ -1,5 +1,6 @@
 #include "wdm.h"
 
+#include "memory.h"
 #include "utils.h"
 
 // ---------------------------------------------------------
@@ -31,7 +32,7 @@ wdm_utils_full_pathname(const LPWSTR path) {
     is_directory = wdm_utils_unicode_is_directory(maxed_path);
 
     full_path_len = wcslen(maxed_path);
-    full_path = ALLOC_N(WCHAR, full_path_len + (is_directory ? 2 : 1)); // When it's a directory, add extra 1 for the (\) at the end
+    full_path = WDM_ALLOC_N(WCHAR, full_path_len + (is_directory ? 2 : 1)); // When it's a directory, add extra 1 for the (\) at the end
 
     wcscpy(full_path, maxed_path);
 
