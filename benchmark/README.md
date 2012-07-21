@@ -20,6 +20,8 @@ Here are the results of the benchmarks which were gathered on an Intel Core 2 Du
 
 ### Detecting changes
 
+![Detecting changes results](https://github.com/Maher4Ever/wdm/raw/0a00e997b7f2b066bd6841e84018abbb7d8283fa/benchmark/detecting_changes/results.png)
+
 ### Impact on performance
 
 From the previous results you can conclude that FChange and WDM are the obvious winners. Thus, this test didn't include em-dir-watcher.
