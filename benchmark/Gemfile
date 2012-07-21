@@ -1,0 +1,11 @@
+﻿source :rubygems
+
+gem 'ruby-prof', '0.11.2'
+
+gem 'rb-fchange', '0.0.5'
+
+gem 'win32-changenotify', '0.5.1'
+gem 'win32-event', '0.6.0'
+gem 'em-dir-watcher', '0.9.4'
+
+gem 'wdm', :path => '..'
