@@ -1,8 +1,11 @@
 require_relative '../lib/wdm'
 
 monitor = WDM::Monitor.new
-monitor.watch('C:\Users\Maher\Desktop\test') { puts "change 1!" }
-monitor.watch('C:\Users\Maher\Desktop\psds') { puts "change 2!" }
+monitor.watch_recursively('C:\Users\Maher\Desktop\test') do |change|
+  puts "#{change.type.to_s.upcase}: '#{change.path}'"
+end
+
+puts "Running the monitor..."
 
 thread = Thread.new {
 	monitor.run!
@@ -10,4 +13,7 @@ thread = Thread.new {
 
 sleep(10)
 
+puts "Stopping the monitor..."
+
 monitor.stop
+thread.join
