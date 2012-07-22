@@ -10,9 +10,9 @@ extern "C" {
 // ---------------------------------------------------------
 
 #define WDM_MONITOR_FLAGS_DEFAULT       \
-    FILE_NOTIFY_CHANGE_LAST_WRITE       \
-        | FILE_NOTIFY_CHANGE_CREATION   \
-        | FILE_NOTIFY_CHANGE_FILE_NAME
+    FILE_NOTIFY_CHANGE_FILE_NAME        \
+        | FILE_NOTIFY_CHANGE_DIR_NAME   \
+        | FILE_NOTIFY_CHANGE_LAST_WRITE
 
 // ----------------------------------------------------------
 // Global variables
