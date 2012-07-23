@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{Windows Directory Monitor (WDM) is a threaded directories monitor for Windows.}
   gem.homepage      = "https://github.com/Maher4Ever/wdm"
 
-  gem.files         = `git ls-files`.split($\)
+  gem.files         = `git ls-files -- ext/*`.split($\) + %w[LICENSE README.md]
   gem.extensions    = ['ext/wdm/extconf.rb']
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
