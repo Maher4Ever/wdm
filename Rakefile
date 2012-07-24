@@ -2,6 +2,8 @@
 require 'bundler/gem_tasks'
 require 'rake/extensiontask'
 
+ENV['PATH'] = 'c:\\Ruby193\\bin;c:\\Ruby193\\mingw\\bin;' + ENV['PATH']
+ 
 # Compile the extension
 Rake::ExtensionTask.new('wdm')
 

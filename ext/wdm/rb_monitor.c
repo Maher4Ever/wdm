@@ -169,9 +169,6 @@ combined_watch(BOOL recursively, int argc, VALUE *argv, VALUE self) {
     entry->user_data->callback =  rb_block_proc();
     entry->user_data->flags = RARRAY_LEN(flags) == 0 ? WDM_MONITOR_FLAGS_DEFAULT : extract_flags_from_rb_array(flags);
 
-    // Prevent the GC from collecting the block until we are done.
-    rb_global_variable(&entry->user_data->callback);
-
     // WTF Ruby source: The original code (file.c) uses the following macro to make sure that the encoding
     // of the string is ASCII-compatible, but UTF-16LE (Windows default encoding) is not!!!
     //
