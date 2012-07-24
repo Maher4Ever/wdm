@@ -447,7 +447,7 @@ rb_monitor_run_bang(VALUE self) {
 
     if (already_running) {
         WDM_DEBUG("Not doing anything because the monitor is already running!");
-        return;
+        return Qnil;
     }
 
     // Reset events
@@ -476,7 +476,7 @@ rb_monitor_run_bang(VALUE self) {
 
         if ( ! monitor->running ) {
             wdm_queue_empty(monitor->changes);
-            return;
+            return Qnil;
         }
 
         process_changes(monitor->changes);
