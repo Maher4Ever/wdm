@@ -15,7 +15,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = '0.0.2'
 
-  gem.platform = 'x86-mingw32'
   gem.required_ruby_version = '>= 1.9.2'
 
   gem.add_development_dependency 'rake-compiler'
