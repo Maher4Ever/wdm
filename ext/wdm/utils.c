@@ -46,7 +46,14 @@ wdm_utils_unicode_is_directory(const LPWSTR path) {
     WCHAR unicode_path[WDM_MAX_WCHAR_LONG_PATH];
 
     wcscpy(unicode_path, L"\\\\?\\");
-    wcscat(unicode_path, path);
+
+    if ( wdm_utils_is_unc_path(path) ) {
+        wcscat(unicode_path, L"UNC\\");
+        wcscat(unicode_path, path + 2); // +2 to skip the begin of a UNC path
+    }
+    else {
+        wcscat(unicode_path, path);
+    }
 
     return wdm_utils_is_directory(unicode_path);
 }
@@ -57,4 +64,9 @@ wdm_utils_is_directory(const LPWSTR path) {
 
   return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
          (dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+}
+
+BOOL
+wdm_utils_is_unc_path(const LPWSTR path) {
+    return path[0] == path[1] && path[0] == L'\\';
 }

@@ -86,12 +86,22 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
     {
         LPWSTR unicode_absolute_filepath;
         WCHAR absolute_long_filepath[WDM_MAX_WCHAR_LONG_PATH];
+        BOOL is_unc_path;
 
-        unicode_absolute_filepath = ALLOCA_N(WCHAR, absolute_filepath_len + 4 + 1); // 4 for "\\?\" and 1 for NULL
+        is_unc_path = wdm_utils_is_unc_path(absolute_filepath);
+
+        unicode_absolute_filepath = ALLOCA_N(WCHAR, absolute_filepath_len + (is_unc_path ? 8 : 4) + 1); // 8 for "\\?\UNC\" or 4 for "\\?\", and 1 for \0
 
         unicode_absolute_filepath[0] = L'\0';
         wcscat(unicode_absolute_filepath, L"\\\\?\\");
-        wcscat(unicode_absolute_filepath, absolute_filepath);
+
+        if ( is_unc_path ) {
+            wcscat(unicode_absolute_filepath, L"UNC\\");
+            wcscat(unicode_absolute_filepath, absolute_filepath + 2); // +2 to skip the begin of a UNC path
+        }
+        else {
+            wcscat(unicode_absolute_filepath, absolute_filepath);
+        }
 
         // Convert to the long filename form. Unfortunately, this
         // does not work for deletions, so it's an imperfect fix.
