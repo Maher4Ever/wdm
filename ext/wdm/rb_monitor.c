@@ -47,7 +47,7 @@ static VALUE rb_monitor_watch(int, VALUE*, VALUE);
 static VALUE rb_monitor_watch_recursively(int, VALUE*, VALUE);
 
 static void CALLBACK handle_entry_change(DWORD, DWORD, LPOVERLAPPED);
-static void register_monitoring_entry(WDM_PEntry);
+static BOOL register_monitoring_entry(WDM_PEntry);
 static DWORD WINAPI start_monitoring(LPVOID);
 
 static VALUE wait_for_changes(LPVOID);
@@ -270,14 +270,15 @@ handle_entry_change(
     }
 
     param = (WDM_PMonitorCallbackParam)event_container->hEvent;
-    data_to_process = wdm_queue_item_new();
+    data_to_process = wdm_queue_item_new(WDM_QUEUE_ITEM_TYPE_DATA);
+    data_to_process->data = wdm_queue_item_data_new();
 
     WDM_WDEBUG("Change detected in '%s'", param->entry->user_data->dir);
 
-    data_to_process->user_data = param->entry->user_data;
+    data_to_process->data->user_data = param->entry->user_data;
 
     // Copy change data to the backup buffer
-    memcpy(data_to_process->buffer, param->entry->buffer, bytes_transfered);
+    memcpy(data_to_process->data->buffer, param->entry->buffer, bytes_transfered);
 
     // Add the backup buffer to the change queue
     wdm_queue_enqueue(param->monitor->changes, data_to_process);
@@ -286,12 +287,12 @@ handle_entry_change(
     register_monitoring_entry(param->entry);
 
     // Tell the processing thread to process the changes
-    if ( WaitForSingleObject( param->monitor->process_event, 0) != WAIT_OBJECT_0 ) { // Check if already signaled
+    if ( WaitForSingleObject(param->monitor->process_event, 0) != WAIT_OBJECT_0 ) { // Check if already signaled
         SetEvent(param->monitor->process_event);
     }
 }
 
-static void
+static BOOL
 register_monitoring_entry(WDM_PEntry entry) {
     BOOL success;
     DWORD bytes;
@@ -309,11 +310,11 @@ register_monitoring_entry(WDM_PEntry entry) {
     );
 
     if ( ! success ) {
-        // --------------------------
-        // TODO: Handle error!
-        // --------------------------
-        WDM_DEBUG("Failed registering directory: '%s'!", entry->user_data->dir);
+        WDM_DEBUG("ReadDirectoryChangesW failed with error (%d): %s", GetLastError(), rb_w32_strerror(GetLastError()));
+        return FALSE;
     }
+
+    return TRUE;
 }
 
 static DWORD WINAPI
@@ -327,7 +328,24 @@ start_monitoring(LPVOID param) {
     WDM_DEBUG("Starting the monitoring thread!");
 
     while(curr_entry != NULL) {
-        register_monitoring_entry(curr_entry);
+        if ( ! register_monitoring_entry(curr_entry) ) {
+            WDM_PQueueItem error_item;
+            int directory_bytes;
+            LPSTR multibyte_directory;
+
+            directory_bytes = WideCharToMultiByte(CP_UTF8, 0, curr_entry->user_data->dir, -1, NULL, 0, NULL, NULL);
+            multibyte_directory = ALLOCA_N(CHAR, directory_bytes);
+            WideCharToMultiByte(CP_UTF8, 0, curr_entry->user_data->dir, -1, multibyte_directory, directory_bytes, NULL, NULL);
+
+            error_item = wdm_queue_item_new(WDM_QUEUE_ITEM_TYPE_ERROR);
+            error_item->error = wdm_queue_item_error_new(
+                eWDM_UnwatchableDirectoryError, "Can't watch directory: '%s'!", multibyte_directory
+            );
+
+            wdm_queue_enqueue(monitor->changes, error_item);
+            SetEvent(monitor->process_event);
+        }
+
         curr_entry = curr_entry->next;
     }
 
@@ -364,23 +382,29 @@ process_changes(WDM_PQueue changes) {
 
     while( ! wdm_queue_is_empty(changes) ) {
         item = wdm_queue_dequeue(changes);
-        current_info_entry_offset = (LPBYTE)item->buffer;
 
-        for(;;) {
-            info = (PFILE_NOTIFY_INFORMATION)current_info_entry_offset;
-            event = wdm_rb_change_new_from_notification(item->user_data->dir, info);
+        if ( item->type == WDM_QUEUE_ITEM_TYPE_ERROR ) {
+            rb_raise(item->error->exception_klass, item->error->message);
+        }
+        else {
+            current_info_entry_offset = (LPBYTE)item->data->buffer;
 
-            WDM_DEBUG("---------------------------");
-            WDM_DEBUG("Running user callback");
-            WDM_DEBUG("--------------------------");
+            for(;;) {
+                info = (PFILE_NOTIFY_INFORMATION)current_info_entry_offset;
+                event = wdm_rb_change_new_from_notification(item->data->user_data->dir, info);
 
-            rb_funcall(item->user_data->callback, wdm_rb_sym_call, 1, event);
+                WDM_DEBUG("---------------------------");
+                WDM_DEBUG("Running user callback");
+                WDM_DEBUG("--------------------------");
 
-            WDM_DEBUG("---------------------------");
+                rb_funcall(item->data->user_data->callback, wdm_rb_sym_call, 1, event);
 
-            if ( ! info->NextEntryOffset ) break;
+                WDM_DEBUG("---------------------------");
 
-            current_info_entry_offset += info->NextEntryOffset;
+                if ( ! info->NextEntryOffset ) break;
+
+                current_info_entry_offset += info->NextEntryOffset;
+            }
         }
 
         wdm_queue_item_free(item);
@@ -520,6 +544,7 @@ wdm_rb_monitor_init() {
     eWDM_MonitorRunningError = rb_define_class_under(mWDM, "MonitorRunningError", eWDM_Error);
     eWDM_InvalidDirectoryError = rb_define_class_under(mWDM, "InvalidDirectoryError", eWDM_Error);
     eWDM_UnknownFlagError = rb_define_class_under(mWDM, "UnknownFlagError", eWDM_Error);
+    eWDM_UnwatchableDirectoryError = rb_define_class_under(mWDM, "UnwatchableDirectoryError", eWDM_Error);
 
     cWDM_Monitor = rb_define_class_under(mWDM, "Monitor", rb_cObject);
 

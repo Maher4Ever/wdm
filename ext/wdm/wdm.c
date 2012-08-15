@@ -16,6 +16,7 @@ VALUE mWDM;
 VALUE eWDM_Error;
 VALUE eWDM_MonitorRunningError;
 VALUE eWDM_InvalidDirectoryError;
+VALUE eWDM_UnwatchableDirectoryError;
 
 ID wdm_rb_sym_call;
 ID wdm_rb_sym_at_file;

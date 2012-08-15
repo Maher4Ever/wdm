@@ -1,3 +1,5 @@
+#include <stdarg.h>
+
 #include "wdm.h"
 
 #include "memory.h"
@@ -7,22 +9,73 @@
 // Queue item functions
 // ---------------------------------------------------------
 
+WDM_PQueueItemError wdm_queue_item_error_new(VALUE exception, LPCSTR format, ...) {
+    WDM_PQueueItemError error;
+    va_list ap;
+    int length;
+
+    error = WDM_ALLOC(WDM_QueueItemError);
+
+    va_start(ap, format);
+    length = _vscprintf(format, ap);
+    error->message = WDM_ALLOC_N(CHAR, length + 1);
+    vsprintf(error->message, format, ap);
+    va_end(ap);
+
+    error->exception_klass = exception;
+
+    return error;
+}
+
+void wdm_queue_item_error_free(WDM_PQueueItemError error) {
+    if ( error->message != NULL ) free(error->message);
+    free(error);
+}
+
+WDM_PQueueItemData wdm_queue_item_data_new() {
+    WDM_PQueueItemData data;
+
+    data = ALLOC(WDM_QueueItemData);
+    data->user_data = NULL;
+
+    ZeroMemory(&data->buffer, WDM_BUFFER_SIZE);
+
+    return data;
+}
+
+void wdm_queue_item_data_free(WDM_PQueueItemData data) {
+    free(data);
+}
+
 WDM_PQueueItem
-wdm_queue_item_new() {
+wdm_queue_item_new(WDM_QueueItemType type) {
     WDM_PQueueItem item;
 
     item = WDM_ALLOC(WDM_QueueItem);
-    item->user_data = NULL;
+    item->type = type;
+
+    if ( type == WDM_QUEUE_ITEM_TYPE_ERROR ) {
+        item->error = NULL;
+    }
+    else {
+        item->data = NULL;
+    }
+
     item->previous    = NULL;
     item->next        = NULL;
-
-    ZeroMemory(&item->buffer, WDM_BUFFER_SIZE);
 
     return item;
 }
 
 void
 wdm_queue_item_free(WDM_PQueueItem item) {
+    if ( item->type == WDM_QUEUE_ITEM_TYPE_ERROR ) {
+        if ( item->error != NULL ) wdm_queue_item_error_free(item->error);
+    }
+    else {
+        if ( item->data != NULL ) wdm_queue_item_data_free(item->data);
+    }
+
     // We can't really do anything to the prev pointer nor the next pointer,
     // because we might break any linking the user has established.
     free(item);
