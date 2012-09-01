@@ -71,7 +71,7 @@ The supported options are:
       <td>:default</td>
 
       <td>
-        The default set of options A combination of the :files, :directories, :last_write options.
+        The default set of options for watching directories. It's a combination of the :files, :directories and the :last_write options.
       </td>
     </tr>
     
