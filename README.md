@@ -20,7 +20,11 @@ Or install it yourself as:
 
 ## Usage
 
-For a simple example on how to use WDM, you can look at the `example` directory in the repository.
+For a simple example on how to use WDM, you can take a look at the `example` directory of the repository.
+
+## Benchmarks
+
+You can find a comparison of different ruby libraries for watching directories changes on Windows in the `benchmark` directory of the repository.
 
 ## Reference
 
@@ -44,13 +48,13 @@ monitor.watch('C:\Users\Maher\Desktop') { |change|  puts change.path }
 monitor.watch_recursively('C:\Users\Maher\Projects\my_project') { |change|  puts change.path }
 ```
 
-Both `Monitor#watch` and `Monitor#watch_recursively` take a second parameter to specify the watching options:
+Both `Monitor#watch` and `Monitor#watch_recursively` can take a series of options after the first parameter to specify the watching options:
 
 ```ruby
 monitor = WDM::Monitor.new
 
 # Report changes to directories in the watched directory (Ex.: Addition of an empty directory)
-monitor.watch('C:\Users\Maher\Desktop', :directories)
+monitor.watch('C:\Users\Maher\Desktop', :default, :directories)
 ```
 
 The supported options are:
@@ -64,15 +68,15 @@ The supported options are:
   </thead>
   <tbody>
     <tr>
-      <td>`:default`</td>
+      <td>:default</td>
 
       <td>
-        A combination of the `:files`, `:directories`, `:last_write` options.
+        The default set of options A combination of the :files, :directories, :last_write options.
       </td>
     </tr>
     
     <tr>
-      <td>`:files`</td>
+      <td>:files</td>
 
       <td>
         Any file name change in the watched directory or subtree causes a change
@@ -82,7 +86,7 @@ The supported options are:
     </tr>
 
     <tr>
-      <td>`:directories`</td>
+      <td>:directories</td>
 
       <td>
         Any directory-name change in the watched directory or subtree causes a
@@ -92,7 +96,7 @@ The supported options are:
     </tr>
 
     <tr>
-      <td>`:attributes`</td>
+      <td>:attributes</td>
 
       <td>
         Any attribute change in the watched directory or subtree causes a change
@@ -101,7 +105,7 @@ The supported options are:
     </tr>
 
     <tr>
-      <td>`:size`</td>
+      <td>:size</td>
 
       <td>
         Any file-size change in the watched directory or subtree causes a change
@@ -113,7 +117,7 @@ The supported options are:
     </tr>
 
     <tr>
-      <td>`:last_write`</td>
+      <td>:last_write</td>
 
       <td>
         Any change to the last write-time of files in the watched directory or
@@ -125,7 +129,7 @@ The supported options are:
     </tr>
 
     <tr>
-      <td>`:last_access`</td>
+      <td>:last_access</td>
 
       <td>
         Any change to the last access time of files in the watched directory or
@@ -134,7 +138,7 @@ The supported options are:
     </tr>
 
     <tr>
-      <td>`:creation`</td>
+      <td>:creation</td>
 
       <td>
         Any change to the creation time of files in the watched directory or subtree
@@ -143,7 +147,7 @@ The supported options are:
     </tr>
 
     <tr>
-      <td>`:security`</td>
+      <td>:security</td>
 
       <td>
         Any security-descriptor change in the watched directory or subtree causes a
@@ -169,7 +173,7 @@ worker_thread = Thread.new { monitor.run! }
 # The process won't block; it will continue with the next line of code...
 ```
 
-When you are done with the monitor, don't forget to stop it. Here is a snippet to always stop the monitor when the ruby process exist:
+When you are done with the monitor, don't forget to stop it. Here is a snippet to always stop the monitor when the ruby process exit:
 
 ```ruby
 at_exit { monitor.stop }
