@@ -4,6 +4,8 @@ Windows Directory Monitor (WDM) is a thread-safe ruby library which can be used 
 
 It's mostly implemented in C and uses the Win32 API for a better performance.
 
+**Important**: WDM only runs on ruby versions >= *1.9.2*! 
+
 ## Installation
 
 If you are using Bundler, add the following line to your application's Gemfile:
