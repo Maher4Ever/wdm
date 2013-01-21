@@ -35,7 +35,7 @@ void wdm_queue_item_error_free(WDM_PQueueItemError error) {
 WDM_PQueueItemData wdm_queue_item_data_new() {
     WDM_PQueueItemData data;
 
-    data = ALLOC(WDM_QueueItemData);
+    data = WDM_ALLOC(WDM_QueueItemData);
     data->user_data = NULL;
 
     ZeroMemory(&data->buffer, WDM_BUFFER_SIZE);
