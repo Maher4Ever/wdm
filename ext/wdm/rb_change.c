@@ -11,7 +11,7 @@
 // Internal constants
 // ---------------------------------------------------------
 
-// The _wsplitpat constants account for two NULL chars, so substract 1 because we only need one!
+// The _wsplitpat constants account for two NULL chars, so subtract 1 because we only need one!
 #define WDM_MAX_FILENAME (_MAX_FNAME + _MAX_EXT - 1)
 
 // ----------------------------------------------------------
@@ -38,10 +38,11 @@ static VALUE extract_change_type_from_notification(const PFILE_NOTIFY_INFORMATIO
 // ----------------------------------------------------------
 
 // TODO:
-//   1. this function uses a lot of 'alloca' calls, which AFAIK is not recommeneded! Can this be avoided?
+//   1. this function uses a lot of 'alloca' calls, which AFAIK is not recommended! Can this be avoided?
 //   2. all wcscat calls can be done faster with memcpy, but is it worth sacrificing the readability?
 static VALUE
-extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIFY_INFORMATION info) {
+extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIFY_INFORMATION info)
+{
     LPWSTR buffer, absolute_filepath;
     WCHAR file[_MAX_FNAME], ext[_MAX_EXT], filename[WDM_MAX_FILENAME];
     DWORD filename_len, absolute_filepath_len;
@@ -115,7 +116,7 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
         }
     }
 
-    // The convention in Ruby is to use forward-slashes to seprarate dirs on all platforms.
+    // The convention in Ruby is to use forward-slashes to separate dirs on all platforms.
     wdm_utils_convert_back_to_forward_slashes(absolute_filepath, absolute_filepath_len + 1);
 
     // Convert the path from WCHAR to multibyte CHAR to use it in a ruby string
@@ -141,7 +142,8 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
 }
 
 static VALUE
-extract_change_type_from_notification(const PFILE_NOTIFY_INFORMATION info) {
+extract_change_type_from_notification(const PFILE_NOTIFY_INFORMATION info)
+{
     ID type;
 
     switch(info->Action) {
@@ -162,7 +164,8 @@ extract_change_type_from_notification(const PFILE_NOTIFY_INFORMATION info) {
 }
 
 VALUE
-wdm_rb_change_new_from_notification(const LPWSTR base_dir, const PFILE_NOTIFY_INFORMATION info) {
+wdm_rb_change_new_from_notification(const LPWSTR base_dir, const PFILE_NOTIFY_INFORMATION info)
+{
     VALUE change;
 
     change = rb_class_new_instance(0, NULL, cWDM_Change);
@@ -177,7 +180,8 @@ wdm_rb_change_new_from_notification(const LPWSTR base_dir, const PFILE_NOTIFY_IN
 }
 
 void
-wdm_rb_change_init() {
+wdm_rb_change_init()
+{
     WDM_DEBUG("Registering WDM::Event with Ruby!");
 
     wdm_rb_sym_at_path = rb_intern("@path");

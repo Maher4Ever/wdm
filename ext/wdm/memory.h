@@ -9,11 +9,9 @@ extern "C" {
 // Prototypes
 // ---------------------------------------------------------
 
-void *
-wdm_memory_malloc (size_t);
+void* wdm_memory_malloc (size_t);
 
-void *
-wdm_memory_realloc (void *, size_t);
+void* wdm_memory_realloc (void*, size_t);
 
 // ---------------------------------------------------------
 // Macros

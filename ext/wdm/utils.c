@@ -8,7 +8,8 @@
 // ---------------------------------------------------------
 
 LPWSTR
-wdm_utils_convert_back_to_forward_slashes(LPWSTR path, DWORD path_len) {
+wdm_utils_convert_back_to_forward_slashes(LPWSTR path, DWORD path_len)
+{
     UINT i;
 
     for(i = 0; i < (path_len - 1); ++i) { // path_len-1 because we don't need to check the NULL-char!
@@ -19,7 +20,8 @@ wdm_utils_convert_back_to_forward_slashes(LPWSTR path, DWORD path_len) {
 }
 
 LPWSTR
-wdm_utils_full_pathname(const LPWSTR path) {
+wdm_utils_full_pathname(const LPWSTR path)
+{
     WCHAR maxed_path[WDM_MAX_WCHAR_LONG_PATH];
     LPWSTR full_path;
     size_t full_path_len;
@@ -42,7 +44,8 @@ wdm_utils_full_pathname(const LPWSTR path) {
 }
 
 BOOL
-wdm_utils_unicode_is_directory(const LPWSTR path) {
+wdm_utils_unicode_is_directory(const LPWSTR path)
+{
     WCHAR unicode_path[WDM_MAX_WCHAR_LONG_PATH];
 
     wcscpy(unicode_path, L"\\\\?\\");
@@ -59,7 +62,8 @@ wdm_utils_unicode_is_directory(const LPWSTR path) {
 }
 
 BOOL
-wdm_utils_is_directory(const LPWSTR path) {
+wdm_utils_is_directory(const LPWSTR path)
+{
   DWORD dwAttrib = GetFileAttributesW(path);
 
   return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
@@ -67,6 +71,7 @@ wdm_utils_is_directory(const LPWSTR path) {
 }
 
 BOOL
-wdm_utils_is_unc_path(const LPWSTR path) {
+wdm_utils_is_unc_path(const LPWSTR path)
+{
     return path[0] == path[1] && path[0] == L'\\';
 }

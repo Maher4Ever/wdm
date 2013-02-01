@@ -60,7 +60,8 @@ static VALUE rb_monitor_stop(VALUE);
 // ----------------------------------------------------------
 
 static void
-monitor_mark(LPVOID param) {
+monitor_mark(LPVOID param)
+{
     WDM_PMonitor monitor;
     WDM_PEntry entry;
 
@@ -74,7 +75,8 @@ monitor_mark(LPVOID param) {
 }
 
 static void
-monitor_free(LPVOID param) {
+monitor_free(LPVOID param)
+{
     WDM_PMonitor monitor;
     WDM_PEntry entry;
 
@@ -98,7 +100,8 @@ monitor_free(LPVOID param) {
 }
 
 static VALUE
-rb_monitor_alloc(VALUE self) {
+rb_monitor_alloc(VALUE self)
+{
     WDM_DEBUG("--------------------------------");
     WDM_DEBUG("Allocating a new monitor object!");
     WDM_DEBUG("--------------------------------");
@@ -107,10 +110,11 @@ rb_monitor_alloc(VALUE self) {
 }
 
 static DWORD
-id_to_flag(ID id) {
+id_to_flag(ID id)
+{
     if ( id == wdm_rb_sym_default ) return WDM_MONITOR_FLAGS_DEFAULT;
 
-    // TODO: Maybe reorder the if's in the frequentie of use for better performance?
+    // TODO: Maybe reorder the if's in the frequency of use for better performance?
     if ( id == wdm_rb_sym_files ) return FILE_NOTIFY_CHANGE_FILE_NAME;
     if ( id == wdm_rb_sym_directories ) return FILE_NOTIFY_CHANGE_DIR_NAME;
     if ( id == wdm_rb_sym_attributes ) return FILE_NOTIFY_CHANGE_ATTRIBUTES;
@@ -124,7 +128,8 @@ id_to_flag(ID id) {
 }
 
 static DWORD
-extract_flags_from_rb_array(VALUE flags_array) {
+extract_flags_from_rb_array(VALUE flags_array)
+{
     VALUE flag_symbol;
     DWORD flags;
 
@@ -140,7 +145,8 @@ extract_flags_from_rb_array(VALUE flags_array) {
 }
 
 static VALUE
-combined_watch(BOOL recursively, int argc, VALUE *argv, VALUE self) {
+combined_watch(BOOL recursively, int argc, VALUE *argv, VALUE self)
+{
     WDM_PMonitor monitor;
     WDM_PEntry entry;
     int directory_letters_count;
@@ -237,12 +243,14 @@ combined_watch(BOOL recursively, int argc, VALUE *argv, VALUE self) {
 }
 
 static VALUE
-rb_monitor_watch(int argc, VALUE *argv, VALUE self) {
+rb_monitor_watch(int argc, VALUE *argv, VALUE self)
+{
     return combined_watch(FALSE, argc, argv, self);
 }
 
 static VALUE
-rb_monitor_watch_recursively(int argc, VALUE *argv, VALUE self) {
+rb_monitor_watch_recursively(int argc, VALUE *argv, VALUE self)
+{
     return combined_watch(TRUE, argc, argv, self);
 }
 
@@ -256,7 +264,7 @@ handle_entry_change(
     WDM_PQueueItem data_to_process;
 
     if ( err_code == ERROR_OPERATION_ABORTED ) {
-        // Async operation was canceld. This shouldn't happen.
+        // Async operation was canceled. This shouldn't happen.
         // TODO:
         //   1. Maybe add a union in the queue for errors?
         //   2. What's the best action when this happens?
@@ -293,7 +301,8 @@ handle_entry_change(
 }
 
 static BOOL
-register_monitoring_entry(WDM_PEntry entry) {
+register_monitoring_entry(WDM_PEntry entry)
+{
     BOOL success;
     DWORD bytes;
     bytes = 0; // Not used because the process callback gets passed the written bytes
@@ -318,7 +327,8 @@ register_monitoring_entry(WDM_PEntry entry) {
 }
 
 static DWORD WINAPI
-start_monitoring(LPVOID param) {
+start_monitoring(LPVOID param)
+{
     WDM_PMonitor monitor;
     WDM_PEntry curr_entry;
 
@@ -361,7 +371,8 @@ start_monitoring(LPVOID param) {
 }
 
 static VALUE
-wait_for_changes(LPVOID param) {
+wait_for_changes(LPVOID param)
+{
     HANDLE process_event;
 
     process_event = (HANDLE)param;
@@ -370,7 +381,8 @@ wait_for_changes(LPVOID param) {
 }
 
 static void
-process_changes(WDM_PQueue changes) {
+process_changes(WDM_PQueue changes)
+{
     WDM_PQueueItem item;
     LPBYTE current_info_entry_offset;
     PFILE_NOTIFY_INFORMATION info;
@@ -412,7 +424,8 @@ process_changes(WDM_PQueue changes) {
 }
 
 static void
-stop_monitoring(LPVOID param) {
+stop_monitoring(LPVOID param)
+{
     BOOL already_stopped;
     WDM_PMonitor monitor;
     WDM_PEntry entry;
@@ -449,7 +462,8 @@ stop_monitoring(LPVOID param) {
 }
 
 static VALUE
-rb_monitor_run_bang(VALUE self) {
+rb_monitor_run_bang(VALUE self)
+{
     DWORD thread_id;
     BOOL already_running,
          waiting_succeeded;
@@ -514,7 +528,8 @@ rb_monitor_run_bang(VALUE self) {
 }
 
 static VALUE
-rb_monitor_stop(VALUE self) {
+rb_monitor_stop(VALUE self)
+{
     WDM_PMonitor monitor;
 
     Data_Get_Struct(self, WDM_Monitor, monitor);
@@ -527,7 +542,8 @@ rb_monitor_stop(VALUE self) {
 }
 
 void
-wdm_rb_monitor_init() {
+wdm_rb_monitor_init()
+{
     WDM_DEBUG("Registering WDM::Monitor with Ruby!");
 
     wdm_rb_sym_call = rb_intern("call");

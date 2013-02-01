@@ -8,7 +8,8 @@
 // ---------------------------------------------------------
 
 WDM_PEntryUserData
-wdm_entry_user_data_new() {
+wdm_entry_user_data_new()
+{
     WDM_PEntryUserData user_data;
 
     user_data = WDM_ALLOC(WDM_EntryUserData);
@@ -20,7 +21,8 @@ wdm_entry_user_data_new() {
 }
 
 void
-wdm_entry_user_data_free(WDM_PEntryUserData user_data) {
+wdm_entry_user_data_free(WDM_PEntryUserData user_data)
+{
     if ( user_data->dir != NULL ) free(user_data->dir);
     free(user_data);
 }
@@ -30,7 +32,8 @@ wdm_entry_user_data_free(WDM_PEntryUserData user_data) {
 // ---------------------------------------------------------
 
 WDM_PEntry
-wdm_entry_new() {
+wdm_entry_new()
+{
     WDM_PEntry entry;
 
     entry = WDM_ALLOC(WDM_Entry);
@@ -46,7 +49,8 @@ wdm_entry_new() {
 }
 
 void
-wdm_entry_free(WDM_PEntry entry) {
+wdm_entry_free(WDM_PEntry entry)
+{
     if ( entry->dir_handle != INVALID_HANDLE_VALUE ) {
         CancelIo(entry->dir_handle); // Stop monitoring changes
         CloseHandle(entry->dir_handle);
@@ -56,7 +60,8 @@ wdm_entry_free(WDM_PEntry entry) {
 }
 
 void
-wdm_entry_list_free(WDM_PEntry entry) {
+wdm_entry_list_free(WDM_PEntry entry)
+{
     WDM_PEntry tmp;
 
     while(entry != NULL) {

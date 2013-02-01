@@ -7,7 +7,8 @@
 #include "monitor.h"
 
 WDM_PMonitor
-wdm_monitor_new() {
+wdm_monitor_new()
+{
     WDM_PMonitor monitor;
 
     monitor = WDM_ALLOC(WDM_Monitor);
@@ -32,7 +33,8 @@ wdm_monitor_new() {
 }
 
 void
-wdm_monitor_free(WDM_PMonitor monitor) {
+wdm_monitor_free(WDM_PMonitor monitor)
+{
     if ( monitor->monitoring_thread != INVALID_HANDLE_VALUE ) CloseHandle(monitor->monitoring_thread);
 
     wdm_entry_list_free(monitor->head);
@@ -45,7 +47,8 @@ wdm_monitor_free(WDM_PMonitor monitor) {
 }
 
 void
-wdm_monitor_update_head(WDM_PMonitor monitor, WDM_PEntry new_head) {
+wdm_monitor_update_head(WDM_PMonitor monitor, WDM_PEntry new_head)
+{
     EnterCriticalSection(&monitor->lock);
         new_head->next = monitor->head;
         monitor->head = new_head;
@@ -53,7 +56,8 @@ wdm_monitor_update_head(WDM_PMonitor monitor, WDM_PEntry new_head) {
 }
 
 WDM_PMonitorCallbackParam
-wdm_monitor_callback_param_new(WDM_PMonitor monitor, WDM_PEntry entry) {
+wdm_monitor_callback_param_new(WDM_PMonitor monitor, WDM_PEntry entry)
+{
     WDM_PMonitorCallbackParam param;
 
     param = WDM_ALLOC(WDM_MonitorCallbackParam);
@@ -65,6 +69,7 @@ wdm_monitor_callback_param_new(WDM_PMonitor monitor, WDM_PEntry entry) {
 }
 
 void
-wdm_monitor_callback_param_free(WDM_PMonitorCallbackParam param) {
+wdm_monitor_callback_param_free(WDM_PMonitorCallbackParam param)
+{
     free(param);
 }

@@ -9,7 +9,8 @@
 // Queue item functions
 // ---------------------------------------------------------
 
-WDM_PQueueItemError wdm_queue_item_error_new(VALUE exception, LPCSTR format, ...) {
+WDM_PQueueItemError wdm_queue_item_error_new(VALUE exception, LPCSTR format, ...)
+{
     WDM_PQueueItemError error;
     va_list ap;
     int length;
@@ -27,12 +28,14 @@ WDM_PQueueItemError wdm_queue_item_error_new(VALUE exception, LPCSTR format, ...
     return error;
 }
 
-void wdm_queue_item_error_free(WDM_PQueueItemError error) {
+void wdm_queue_item_error_free(WDM_PQueueItemError error)
+{
     if ( error->message != NULL ) free(error->message);
     free(error);
 }
 
-WDM_PQueueItemData wdm_queue_item_data_new() {
+WDM_PQueueItemData wdm_queue_item_data_new()
+{
     WDM_PQueueItemData data;
 
     data = WDM_ALLOC(WDM_QueueItemData);
@@ -43,12 +46,14 @@ WDM_PQueueItemData wdm_queue_item_data_new() {
     return data;
 }
 
-void wdm_queue_item_data_free(WDM_PQueueItemData data) {
+void wdm_queue_item_data_free(WDM_PQueueItemData data)
+{
     free(data);
 }
 
 WDM_PQueueItem
-wdm_queue_item_new(WDM_QueueItemType type) {
+wdm_queue_item_new(WDM_QueueItemType type)
+{
     WDM_PQueueItem item;
 
     item = WDM_ALLOC(WDM_QueueItem);
@@ -68,7 +73,8 @@ wdm_queue_item_new(WDM_QueueItemType type) {
 }
 
 void
-wdm_queue_item_free(WDM_PQueueItem item) {
+wdm_queue_item_free(WDM_PQueueItem item)
+{
     if ( item->type == WDM_QUEUE_ITEM_TYPE_ERROR ) {
         if ( item->error != NULL ) wdm_queue_item_error_free(item->error);
     }
@@ -76,7 +82,7 @@ wdm_queue_item_free(WDM_PQueueItem item) {
         if ( item->data != NULL ) wdm_queue_item_data_free(item->data);
     }
 
-    // We can't really do anything to the prev pointer nor the next pointer,
+    // We can't really do anything to the previous pointer nor the next pointer,
     // because we might break any linking the user has established.
     free(item);
 }
@@ -86,7 +92,8 @@ wdm_queue_item_free(WDM_PQueueItem item) {
 // ---------------------------------------------------------
 
 WDM_PQueue
-wdm_queue_new() {
+wdm_queue_new()
+{
     WDM_PQueue queue;
 
     queue = WDM_ALLOC(WDM_Queue);
@@ -103,13 +110,15 @@ wdm_queue_new() {
 }
 
 void
-wdm_queue_free(WDM_PQueue queue) {
+wdm_queue_free(WDM_PQueue queue)
+{
     wdm_queue_empty(queue);
     free(queue);
 }
 
 void
-wdm_queue_enqueue(WDM_PQueue queue, WDM_PQueueItem item) {
+wdm_queue_enqueue(WDM_PQueue queue, WDM_PQueueItem item)
+{
     EnterCriticalSection(&queue->lock);
 
     if ( queue->rear == NULL && queue->front == NULL )  {
@@ -125,7 +134,8 @@ wdm_queue_enqueue(WDM_PQueue queue, WDM_PQueueItem item) {
 }
 
 WDM_PQueueItem
-wdm_queue_dequeue(WDM_PQueue queue) {
+wdm_queue_dequeue(WDM_PQueue queue)
+{
     WDM_PQueueItem item;
 
     EnterCriticalSection(&queue->lock);
@@ -149,13 +159,15 @@ wdm_queue_dequeue(WDM_PQueue queue) {
     return item;
 }
 
-void wdm_queue_empty(WDM_PQueue queue) {
+void wdm_queue_empty(WDM_PQueue queue)
+{
     while( ! wdm_queue_is_empty(queue) ) {
         wdm_queue_item_free(wdm_queue_dequeue(queue));
     }
 }
 
 BOOL
-wdm_queue_is_empty(WDM_PQueue queue) {
+wdm_queue_is_empty(WDM_PQueue queue)
+{
     return queue->front == NULL && queue->rear == NULL;
 }

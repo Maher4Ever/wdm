@@ -2,7 +2,7 @@
 
 #include "memory.h"
 
-void *
+void*
 wdm_memory_malloc (size_t size)
 {
   void *memory = malloc(size);
@@ -14,7 +14,7 @@ wdm_memory_malloc (size_t size)
   return memory;
 }
 
-void *
+void*
 wdm_memory_realloc (void *ptr, size_t size)
 {
   void *memory = realloc(ptr, size);

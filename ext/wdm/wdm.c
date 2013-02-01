@@ -32,7 +32,8 @@ rb_encoding *wdm_rb_enc_utf8;
 // ----------------------------------------------------------
 
 void
-Init_wdm() {
+Init_wdm()
+{
     WDM_DEBUG("Registering WDM with Ruby!");
 
     wdm_rb_enc_utf8 = rb_utf8_encoding();
