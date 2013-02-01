@@ -9,7 +9,8 @@
 // Queue item functions
 // ---------------------------------------------------------
 
-WDM_PQueueItemError wdm_queue_item_error_new(VALUE exception, LPCSTR format, ...)
+WDM_PQueueItemError
+wdm_queue_item_error_new(VALUE exception, LPCSTR format, ...)
 {
     WDM_PQueueItemError error;
     va_list ap;
@@ -28,13 +29,15 @@ WDM_PQueueItemError wdm_queue_item_error_new(VALUE exception, LPCSTR format, ...
     return error;
 }
 
-void wdm_queue_item_error_free(WDM_PQueueItemError error)
+void
+wdm_queue_item_error_free(WDM_PQueueItemError error)
 {
     if ( error->message != NULL ) free(error->message);
     free(error);
 }
 
-WDM_PQueueItemData wdm_queue_item_data_new()
+WDM_PQueueItemData
+wdm_queue_item_data_new()
 {
     WDM_PQueueItemData data;
 
@@ -46,7 +49,8 @@ WDM_PQueueItemData wdm_queue_item_data_new()
     return data;
 }
 
-void wdm_queue_item_data_free(WDM_PQueueItemData data)
+void
+wdm_queue_item_data_free(WDM_PQueueItemData data)
 {
     free(data);
 }
@@ -121,7 +125,7 @@ wdm_queue_enqueue(WDM_PQueue queue, WDM_PQueueItem item)
 {
     EnterCriticalSection(&queue->lock);
 
-    if ( queue->rear == NULL && queue->front == NULL )  {
+    if ( wdm_queue_is_empty(queue) )  {
         queue->front = queue->rear = item;
     }
     else {
@@ -140,7 +144,7 @@ wdm_queue_dequeue(WDM_PQueue queue)
 
     EnterCriticalSection(&queue->lock);
 
-    if ( queue->rear == NULL && queue->front == NULL ) {
+    if ( wdm_queue_is_empty(queue) ) {
         item = NULL;
     }
     else {
@@ -159,14 +163,15 @@ wdm_queue_dequeue(WDM_PQueue queue)
     return item;
 }
 
-void wdm_queue_empty(WDM_PQueue queue)
+void
+wdm_queue_empty(WDM_PQueue queue)
 {
     while( ! wdm_queue_is_empty(queue) ) {
-        wdm_queue_item_free(wdm_queue_dequeue(queue));
+        wdm_queue_item_free( wdm_queue_dequeue(queue) );
     }
 }
 
-BOOL
+inline BOOL
 wdm_queue_is_empty(WDM_PQueue queue)
 {
     return queue->front == NULL && queue->rear == NULL;
