@@ -464,7 +464,6 @@ stop_monitoring(LPVOID param)
 static VALUE
 rb_monitor_run_bang(VALUE self)
 {
-    DWORD thread_id;
     BOOL already_running,
          waiting_succeeded;
     WDM_PMonitor monitor;
@@ -498,7 +497,7 @@ rb_monitor_run_bang(VALUE self)
         start_monitoring,         // thread function name
         monitor,                  // argument to thread function
         0,                        // use default creation flags
-        &thread_id                // returns the thread identifier
+        NULL                      // Ignore thread identifier
     );
 
     if ( monitor->monitoring_thread == NULL ) {
