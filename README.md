@@ -26,7 +26,7 @@ For a simple example on how to use WDM, you can take a look at the `example` dir
 
 ## Benchmarks
 
-You can find a comparison of different ruby libraries for watching directories changes on Windows in the `benchmark` directory of the repository.
+You can find a comparison of different ruby libraries for watching directory changes on Windows in the `benchmark` directory of the repository.
 
 ## Reference
 
@@ -38,11 +38,9 @@ To start watching directories, you need an instance of `WDM::Monitor`:
 monitor = WDM::Monitor.new
 ```
 
-After that, add the directories you want to watch to the monitor with their callbacks:
+After that, register a callback for each directory you want to watch:
 
 ```ruby
-monitor = WDM::Monitor.new
-
 # Watch a single directory
 monitor.watch('C:\Users\Maher\Desktop') { |change|  puts change.path }
 
@@ -53,8 +51,6 @@ monitor.watch_recursively('C:\Users\Maher\Projects\my_project') { |change|  puts
 Both `Monitor#watch` and `Monitor#watch_recursively` can take a series of options after the first parameter to specify the watching options:
 
 ```ruby
-monitor = WDM::Monitor.new
-
 # Report changes to directories in the watched directory (Ex.: Addition of an empty directory)
 monitor.watch('C:\Users\Maher\Desktop', :default, :directories)
 ```
@@ -161,7 +157,7 @@ The supported options are:
 
 These options map to the filters that `ReadDirectoryChangesW` takes in its `dwNotifyFilter` parameter. You can find more info on the [docs page](http://msdn.microsoft.com/en-us/library/windows/desktop/aa365465.aspx) of `ReadDirectoryChangesW`. 
 
-Now all that is left to be done is to run the monitor:
+Now all that's left to be done is to run the monitor:
 
 ```ruby
 monitor.run!
@@ -175,7 +171,7 @@ worker_thread = Thread.new { monitor.run! }
 # The process won't block; it will continue with the next line of code...
 ```
 
-When you are done with the monitor, don't forget to stop it. Here is a snippet to always stop the monitor when the ruby process exit:
+When you are done with the monitor, don't forget to stop it. Here is a snippet to always stop the monitor when the ruby process exits:
 
 ```ruby
 at_exit { monitor.stop }
@@ -192,7 +188,7 @@ The passed argument to the block is an instance of `WDM::Change`. This class has
 
 Download the source, then run the following:
 
-	$ rake compile
+	$ bundle exec rake compile
 
 To get debug messages, you need to enable them in the `global.h` file:
 
