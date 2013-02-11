@@ -6,6 +6,12 @@
 #include "queue.h"
 
 // ---------------------------------------------------------
+// Prototypes of static functions
+// ---------------------------------------------------------
+
+static WDM_PQueueItem do_queue_dequeue(WDM_PQueue queue);
+
+// ---------------------------------------------------------
 // Queue item functions
 // ---------------------------------------------------------
 
@@ -85,8 +91,8 @@ wdm_queue_item_free(WDM_PQueueItem item)
         if ( item->data != NULL ) wdm_queue_item_data_free(item->data);
     }
 
-    // We can't really do anything to the previous pointer nor the next pointer,
-    // because we might break any linking the user has established.
+    // We can't really do anything to the next pointer because
+    // we might break any linking the user has established.
     free(item);
 }
 
@@ -136,11 +142,9 @@ wdm_queue_enqueue(WDM_PQueue queue, WDM_PQueueItem item)
 }
 
 WDM_PQueueItem
-wdm_queue_dequeue(WDM_PQueue queue)
+do_queue_dequeue(WDM_PQueue queue)
 {
     WDM_PQueueItem item;
-
-    EnterCriticalSection(&queue->lock);
 
     if ( wdm_queue_is_empty(queue) ) {
         item = NULL;
@@ -156,6 +160,18 @@ wdm_queue_dequeue(WDM_PQueue queue)
         item->next = NULL;
     }
 
+    return item;
+}
+
+WDM_PQueueItem
+wdm_queue_dequeue(WDM_PQueue queue)
+{
+    WDM_PQueueItem item;
+
+    EnterCriticalSection(&queue->lock);
+
+    item = do_queue_dequeue(queue);
+
     LeaveCriticalSection(&queue->lock);
 
     return item;
@@ -164,9 +180,13 @@ wdm_queue_dequeue(WDM_PQueue queue)
 void
 wdm_queue_empty(WDM_PQueue queue)
 {
+    EnterCriticalSection(&queue->lock);
+
     while( ! wdm_queue_is_empty(queue) ) {
-        wdm_queue_item_free( wdm_queue_dequeue(queue) );
+        wdm_queue_item_free( do_queue_dequeue(queue) );
     }
+
+    LeaveCriticalSection(&queue->lock);
 }
 
 inline BOOL
