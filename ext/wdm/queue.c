@@ -70,7 +70,6 @@ wdm_queue_item_new(WDM_QueueItemType type)
         item->data = NULL;
     }
 
-    item->previous    = NULL;
     item->next        = NULL;
 
     return item;
@@ -130,7 +129,6 @@ wdm_queue_enqueue(WDM_PQueue queue, WDM_PQueueItem item)
     }
     else {
         queue->rear->next = item;
-        item->previous = queue->rear;
         queue->rear = item;
     }
 
@@ -155,7 +153,7 @@ wdm_queue_dequeue(WDM_PQueue queue)
         if ( queue->front == NULL ) queue->rear = NULL;
 
         // Don't allow the user to mess with the queue
-        item->previous = item->next = NULL;
+        item->next = NULL;
     }
 
     LeaveCriticalSection(&queue->lock);

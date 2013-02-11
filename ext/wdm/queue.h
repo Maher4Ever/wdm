@@ -34,11 +34,10 @@ typedef struct WDM_QueueItem {
         WDM_PQueueItemData data;
         WDM_PQueueItemError error;
     };
-    struct WDM_QueueItem* previous;
     struct WDM_QueueItem* next;
 } WDM_QueueItem, *WDM_PQueueItem;
 
-typedef struct WDM_Queue {
+typedef struct {
     CRITICAL_SECTION lock;
     WDM_PQueueItem front;
     WDM_PQueueItem rear;
