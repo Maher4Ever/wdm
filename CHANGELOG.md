@@ -1,7 +1,8 @@
-## 0.1.0 - February 2, 2013
+## 0.1.0 - February 11, 2013
 
 - [#5][]: Fix fatal memory allocation error. ([@jarmo][])
 - [#6][]: Allow installation on non-supported systems.
+- A few improvements.
 
 ## 0.0.3 - August1 6, 2012
 
