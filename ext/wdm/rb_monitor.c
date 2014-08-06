@@ -210,9 +210,6 @@ combined_watch(BOOL recursively, int argc, VALUE *argv, VALUE self)
         rb_raise(eWDM_InvalidDirectoryError, "No such directory: '%s'!", RSTRING_PTR(directory));
     }
 
-    // Tell the GC to collect the tmp string
-    rb_str_resize(os_encoded_directory, 0);
-
     entry->dir_handle = CreateFileW(
         entry->user_data->dir,     // pointer to the file name
         FILE_LIST_DIRECTORY,       // access (read/write) mode
