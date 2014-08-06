@@ -3,6 +3,10 @@
 #define WINVER 0x0500       // Support Windows 2000 and later,
 #define _WIN32_WINNT 0x0500 // this is needed for 'GetLongPathNameW'
 
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
 #ifndef VC_EXTRALEAN
 #define VC_EXTRALEAN        // Exclude rarely-used stuff from Windows headers
 #endif
