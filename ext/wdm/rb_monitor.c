@@ -502,11 +502,14 @@ rb_monitor_run_bang(VALUE self)
     }
 
     while ( monitor->running ) {
-#ifdef HAVE_RB_THREAD_CALL_WITHOUT_GVL
+
+        // Ruby 2.2 removed the 'rb_thread_blocking_region' function. Hence, we now need
+        // to check if the replacement function is defined and use it if it's available.
+        #ifdef HAVE_RB_THREAD_CALL_WITHOUT_GVL
         waiting_succeeded = rb_thread_call_without_gvl(wait_for_changes, monitor->process_event, stop_monitoring, monitor);
-#else
+        #else
         waiting_succeeded = rb_thread_blocking_region(wait_for_changes, monitor->process_event, stop_monitoring, monitor);
-#endif
+        #endif
 
         if ( waiting_succeeded == Qfalse ) {
             rb_raise(eWDM_Error, "Failed while waiting for a change in the watched directories!");
