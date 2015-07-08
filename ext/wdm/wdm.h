@@ -1,14 +1,20 @@
 #include <stdio.h>
 
-#define WINVER 0x0500       // Support Windows 2000 and later,
-#define _WIN32_WINNT 0x0500 // this is needed for 'GetLongPathNameW'
+// Support Windows 2000 and later,
+// this is needed for 'GetLongPathNameW' (both of the following defines)
+#ifndef WINVER
+#define WINVER 0x0500 
+#endif
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
+#endif
 
+// Exclude rarely-used stuff from Windows headers (both of the following defines)
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-
 #ifndef VC_EXTRALEAN
-#define VC_EXTRALEAN        // Exclude rarely-used stuff from Windows headers
+#define VC_EXTRALEAN        
 #endif
 
 #include <Windows.h>
