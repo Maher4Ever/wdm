@@ -21,6 +21,7 @@ if windows? and
    have_header("ruby.h")    and
    have_const('HAVE_RUBY_ENCODING_H')
 then
+   have_func('rb_thread_call_without_gvl')
    generate_makefile()
 else
   generate_dummy_makefile() 

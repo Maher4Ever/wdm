@@ -210,9 +210,6 @@ combined_watch(BOOL recursively, int argc, VALUE *argv, VALUE self)
         rb_raise(eWDM_InvalidDirectoryError, "No such directory: '%s'!", RSTRING_PTR(directory));
     }
 
-    // Tell the GC to collect the tmp string
-    rb_str_resize(os_encoded_directory, 0);
-
     entry->dir_handle = CreateFileW(
         entry->user_data->dir,     // pointer to the file name
         FILE_LIST_DIRECTORY,       // access (read/write) mode
@@ -505,7 +502,11 @@ rb_monitor_run_bang(VALUE self)
     }
 
     while ( monitor->running ) {
+#ifdef HAVE_RB_THREAD_CALL_WITHOUT_GVL
+        waiting_succeeded = rb_thread_call_without_gvl(wait_for_changes, monitor->process_event, stop_monitoring, monitor);
+#else
         waiting_succeeded = rb_thread_blocking_region(wait_for_changes, monitor->process_event, stop_monitoring, monitor);
+#endif
 
         if ( waiting_succeeded == Qfalse ) {
             rb_raise(eWDM_Error, "Failed while waiting for a change in the watched directories!");
