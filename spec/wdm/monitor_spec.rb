@@ -59,7 +59,7 @@ describe WDM::Monitor do
         touch 'file.txt'
       end
 
-      result.called.should be_true
+      expect(result.called).to be_truthy
     end
 
     it 'does not run the block when there are no changes' do
@@ -67,7 +67,7 @@ describe WDM::Monitor do
         # nothing!
       end
 
-      result.called.should be_false
+      expect(result.called).to be_falsey
     end
 
     it 'Passes an instance of WDM::Change to the callback' do
@@ -75,7 +75,7 @@ describe WDM::Monitor do
         touch 'file.txt'
       end
 
-      result.change.should be_instance_of(WDM::Change)
+      expect(result.change).to be_instance_of(WDM::Change)
     end
 
     context 'with no flags passed to watch' do
@@ -84,8 +84,8 @@ describe WDM::Monitor do
           touch 'file.txt'
         end
 
-        result.change.path.should == "#{result.directory}/file.txt"
-        result.change.type.should == :added
+        expect(result.change.path).to be == "#{result.directory}/file.txt"
+        expect(result.change.type).to be == :added
       end
 
       it 'detects modified files' do
@@ -96,8 +96,8 @@ describe WDM::Monitor do
             touch 'file.txt'
           end
 
-          result.change.path.should == "#{result.directory}/file.txt"
-          result.change.type.should == :modified
+          expect(result.change.path).to be == "#{result.directory}/file.txt"
+          expect(result.change.type).to be == :modified
         end
       end
 
@@ -109,8 +109,8 @@ describe WDM::Monitor do
             rm 'file.txt'
           end
 
-          result.change.path.should == "#{result.directory}/file.txt"
-          result.change.type.should == :removed
+          expect(result.change.path).to be == "#{result.directory}/file.txt"
+          expect(result.change.type).to be == :removed
         end
       end
 
@@ -122,11 +122,11 @@ describe WDM::Monitor do
             mv 'file.txt', 'another.txt'
           end
 
-          result.changes[0].change.path.should == "#{result.directory}/file.txt"
-          result.changes[0].change.type.should == :renamed_old_file
+          expect(result.changes[0].change.path).to be == "#{result.directory}/file.txt"
+          expect(result.changes[0].change.type).to be == :renamed_old_file
 
-          result.changes[1].change.path.should == "#{result.directory}/another.txt"
-          result.changes[1].change.type.should == :renamed_new_file
+          expect(result.changes[1].change.path).to be == "#{result.directory}/another.txt"
+          expect(result.changes[1].change.type).to be == :renamed_new_file
         end
       end
     end
@@ -137,8 +137,8 @@ describe WDM::Monitor do
           mkdir 'new_dir'
         end
 
-        result.change.path.should == "#{result.directory}/new_dir"
-        result.change.type.should == :added
+        expect(result.change.path).to be == "#{result.directory}/new_dir"
+        expect(result.change.type).to be == :added
       end
 
       it 'detects removedd directories' do
@@ -149,8 +149,8 @@ describe WDM::Monitor do
             rmdir 'new_dir'
           end
 
-          result.change.path.should == "#{result.directory}/new_dir"
-          result.change.type.should == :removed
+          expect(result.change.path).to be == "#{result.directory}/new_dir"
+          expect(result.change.type).to be == :removed
         end
       end
     end
@@ -164,8 +164,8 @@ describe WDM::Monitor do
             touch 'some_dir/file.txt'
           end
 
-        result.change.path.should == "#{result.directory}/some_dir/file.txt"
-        result.change.type.should == :added
+          expect(result.change.path).to be == "#{result.directory}/some_dir/file.txt"
+          expect(result.change.type).to be == :added
         end
       end
     end
@@ -175,7 +175,7 @@ describe WDM::Monitor do
         touch 'file.txt'
       end
 
-      result.change.path.should be_tainted
+      expect(result.change.path).to be_tainted
     end
 
     it 'reports changes with absolute paths even when passed relative directory to watch' do
@@ -186,7 +186,7 @@ describe WDM::Monitor do
           touch 'file.txt'
         end
 
-        result.change.path.should == "#{dir}/file.txt"
+        expect(result.change.path).to be == "#{dir}/file.txt"
       end
     end
 
@@ -200,7 +200,7 @@ describe WDM::Monitor do
           touch 'file.txt'
         end
 
-        result.change.path.should == "#{expected_dir}/file.txt"
+        expect(result.change.path).to be == "#{expected_dir}/file.txt"
       end
     end
 
@@ -215,7 +215,7 @@ describe WDM::Monitor do
           touch short_file_name
         end
 
-        result.change.path.should == "#{result.directory}/#{long_file_name}"
+        expect(result.change.path).to be == "#{result.directory}/#{long_file_name}"
       end
     end
 
@@ -224,7 +224,7 @@ describe WDM::Monitor do
         touch 'file.txt'
       end
 
-      result.change.path.encoding.name.should == "UTF-8"
+      expect(result.change.path.encoding.name).to be == "UTF-8"
     end
   end
 end
