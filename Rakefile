@@ -2,6 +2,7 @@
 require 'bundler/gem_tasks'
 require 'rake/extensiontask'
 require 'rspec/core/rake_task'
+require 'devkit' if Gem.win_platform?
 
 RSpec::Core::RakeTask.new(:spec)
 
