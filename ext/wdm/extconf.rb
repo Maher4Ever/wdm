@@ -16,6 +16,7 @@ def windows?
 end
 
 if windows? and
+   have_library("msvcrt") and
    have_library("kernel32") and
    have_header("windows.h") and
    have_header("ruby.h")    and
