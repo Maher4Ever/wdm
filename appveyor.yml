@@ -1,29 +1,32 @@
 ---
+image: Visual Studio 2022
 version: '{build}'
 
 skip_tags: true
 
 environment:
   matrix:
-    - ruby_version: "193"
-      devkit: C:\Ruby193\DevKit
-    - ruby_version: "200"
-      devkit: C:\Ruby21\DevKit
-    - ruby_version: "200-x64"
-      devkit: C:\Ruby21-x64\DevKit
-    - ruby_version: "21"
-      devkit: C:\Ruby21\DevKit
-    - ruby_version: "21-x64"
-      devkit: C:\Ruby21-x64\DevKit
-    - ruby_version: "22"
-      devkit: C:\Ruby21\DevKit
-    - ruby_version: "22-x64"
-      devkit: C:\Ruby21-x64\DevKit
+    - ruby_version: "head-x64"
+    - ruby_version: "25"
+    - ruby_version: "30"
+    - ruby_version: "33-x64"
+
+init:
+  - SET PATH=C:\Ruby%ruby_version%\bin;%PATH%
 
 install:
-  - SET PATH=C:\Ruby%ruby_version%\bin;%PATH%
-  - "%devkit%\\devkitvars.bat"
-  - gem install bundler --no-rdoc --no-ri
+  - ps: |
+      if ($env:ruby_version -like "*head*") {
+        $(new-object net.webclient).DownloadFile("https://github.com/oneclick/rubyinstaller2/releases/download/rubyinstaller-head/rubyinstaller-$env:ruby_version.exe", "$pwd/ruby-setup.exe")
+        cmd /c ruby-setup.exe /verysilent /currentuser /dir=C:/Ruby$env:ruby_version
+      }
+  - ruby --version
+  - gem --version
+  - ridk version
+  - ridk enable
+  - c:/msys64/usr/bin/bash -lc "pacman -S --noconfirm --needed ${MINGW_PACKAGE_PREFIX}-gcc"
+  - gcc -v
+  - gem install bundler:2.3.27 --conservative --no-doc
   - bundler env
   - bundle install --retry=3
 
