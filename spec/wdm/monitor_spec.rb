@@ -170,14 +170,6 @@ describe WDM::Monitor do
       end
     end
 
-    it 'marks changed paths as tainted' do
-      result = run_with_fixture(subject) do
-        touch 'file.txt'
-      end
-
-      expect(result.change.path).to be_tainted
-    end
-
     it 'reports changes with absolute paths even when passed relative directory to watch' do
       fixture do |dir|
         relative_dir = Pathname.new(dir).relative_path_from(Pathname.new(Dir.pwd)).to_s

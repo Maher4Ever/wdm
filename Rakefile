@@ -13,5 +13,5 @@ end
 
 desc "Open an irb session preloaded with WDM"
 task :console do
-  sh "irb -rubygems -I lib -r wdm"
+  sh "irb -I lib -r wdm"
 end

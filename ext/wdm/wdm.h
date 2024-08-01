@@ -3,7 +3,7 @@
 // Support Windows 2000 and later,
 // this is needed for 'GetLongPathNameW' (both of the following defines)
 #ifndef WINVER
-#define WINVER 0x0500 
+#define WINVER 0x0500
 #endif
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0500
@@ -14,13 +14,14 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #ifndef VC_EXTRALEAN
-#define VC_EXTRALEAN        
+#define VC_EXTRALEAN
 #endif
 
 #include <Windows.h>
 
 #include <ruby.h>
 #include <ruby/encoding.h>
+#include <ruby/thread.h>
 
 #ifndef WDM_H
 #define WDM_H
