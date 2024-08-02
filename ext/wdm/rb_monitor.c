@@ -99,6 +99,16 @@ monitor_free(LPVOID param)
     wdm_monitor_free(monitor);
 }
 
+static const rb_data_type_t monitor_data_type = {
+    .wrap_struct_name = "WDM::Monitor",
+    .function = {
+        .dmark = monitor_mark,
+        .dfree = monitor_free,
+        .dsize = NULL,
+    },
+    .flags = 0
+};
+
 static VALUE
 rb_monitor_alloc(VALUE self)
 {
@@ -106,7 +116,7 @@ rb_monitor_alloc(VALUE self)
     WDM_DEBUG("Allocating a new monitor object!");
     WDM_DEBUG("--------------------------------");
 
-    return Data_Wrap_Struct(self, monitor_mark, monitor_free, wdm_monitor_new());
+    return TypedData_Wrap_Struct(self, &monitor_data_type, wdm_monitor_new());
 }
 
 static DWORD
@@ -156,7 +166,7 @@ combined_watch(BOOL recursively, int argc, VALUE *argv, VALUE self)
     // TODO: Maybe raise a more user-friendly error?
     rb_need_block();
 
-    Data_Get_Struct(self, WDM_Monitor, monitor);
+    TypedData_Get_Struct(self, WDM_Monitor, &monitor_data_type, monitor);
 
     EnterCriticalSection(&monitor->lock);
         running = monitor->running;
@@ -467,7 +477,7 @@ rb_monitor_run_bang(VALUE self)
 
     WDM_DEBUG("Running the monitor!");
 
-    Data_Get_Struct(self, WDM_Monitor, monitor);
+    TypedData_Get_Struct(self, WDM_Monitor, &monitor_data_type, monitor);
     already_running = FALSE;
 
     EnterCriticalSection(&monitor->lock);
@@ -529,7 +539,7 @@ rb_monitor_stop(VALUE self)
 {
     WDM_PMonitor monitor;
 
-    Data_Get_Struct(self, WDM_Monitor, monitor);
+    TypedData_Get_Struct(self, WDM_Monitor, &monitor_data_type, monitor);
 
     stop_monitoring(monitor);
 
