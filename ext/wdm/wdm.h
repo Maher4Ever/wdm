@@ -34,7 +34,9 @@ extern "C" {
 // Constants
 // ---------------------------------------------------------
 
+#ifndef WDM_DEBUG_ENABLED
 #define WDM_DEBUG_ENABLED FALSE
+#endif
 
 #define WDM_BUFFER_SIZE 16384 // 2^14 or 16Kb
 

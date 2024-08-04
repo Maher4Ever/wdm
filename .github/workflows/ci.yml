@@ -84,7 +84,7 @@ jobs:
       - name: bundle install
         run: bundle install --retry=3
 
-      - run: gem install --local *.gem --verbose
+      - run: gem install --local *.gem --verbose -- --with-cflags=-DWDM_DEBUG_ENABLED=TRUE
 
       - name: Run windows specs
         if: matrix.os == 'windows'
