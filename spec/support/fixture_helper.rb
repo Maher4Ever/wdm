@@ -21,7 +21,7 @@ module WDM
 
     ensure
       FileUtils.cd pwd
-      FileUtils.rm_rf(path) if File.exists?(path)
+      FileUtils.rm_rf(path) if File.exist?(path)
     end
   end
 end

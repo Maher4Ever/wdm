@@ -16,12 +16,5 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.version       = '0.1.1'
 
-  gem.required_ruby_version = '>= 1.9.2'
-
-  gem.add_development_dependency 'rake-compiler'
-  gem.add_development_dependency 'rspec'
-  gem.add_development_dependency 'guard-rspec'
-  gem.add_development_dependency 'guard-shell'
-  gem.add_development_dependency 'pry'
-  gem.add_development_dependency 'devkit'
+  gem.required_ruby_version = '>= 2.5'
 end

@@ -50,7 +50,7 @@ static void CALLBACK handle_entry_change(DWORD, DWORD, LPOVERLAPPED);
 static BOOL register_monitoring_entry(WDM_PEntry);
 static DWORD WINAPI start_monitoring(LPVOID);
 
-static VALUE wait_for_changes(LPVOID);
+static void *wait_for_changes(void *);
 static void process_changes(WDM_PQueue);
 static void stop_monitoring(LPVOID);
 static VALUE rb_monitor_run_bang(VALUE);
@@ -99,6 +99,16 @@ monitor_free(LPVOID param)
     wdm_monitor_free(monitor);
 }
 
+static const rb_data_type_t monitor_data_type = {
+    .wrap_struct_name = "WDM::Monitor",
+    .function = {
+        .dmark = monitor_mark,
+        .dfree = monitor_free,
+        .dsize = NULL,
+    },
+    .flags = 0
+};
+
 static VALUE
 rb_monitor_alloc(VALUE self)
 {
@@ -106,7 +116,7 @@ rb_monitor_alloc(VALUE self)
     WDM_DEBUG("Allocating a new monitor object!");
     WDM_DEBUG("--------------------------------");
 
-    return Data_Wrap_Struct(self, monitor_mark, monitor_free, wdm_monitor_new());
+    return TypedData_Wrap_Struct(self, &monitor_data_type, wdm_monitor_new());
 }
 
 static DWORD
@@ -156,7 +166,7 @@ combined_watch(BOOL recursively, int argc, VALUE *argv, VALUE self)
     // TODO: Maybe raise a more user-friendly error?
     rb_need_block();
 
-    Data_Get_Struct(self, WDM_Monitor, monitor);
+    TypedData_Get_Struct(self, WDM_Monitor, &monitor_data_type, monitor);
 
     EnterCriticalSection(&monitor->lock);
         running = monitor->running;
@@ -367,14 +377,14 @@ start_monitoring(LPVOID param)
     return 0;
 }
 
-static VALUE
-wait_for_changes(LPVOID param)
+static void *
+wait_for_changes(void *param)
 {
-    HANDLE process_event;
+    HANDLE process_event = (HANDLE)param;
+    VALUE rb_res;
 
-    process_event = (HANDLE)param;
-
-    return WaitForSingleObject(process_event, INFINITE) == WAIT_OBJECT_0 ? Qtrue : Qfalse;
+    rb_res = WaitForSingleObject(process_event, INFINITE) == WAIT_OBJECT_0 ? Qtrue : Qfalse;
+    return (void *)rb_res;
 }
 
 static void
@@ -467,7 +477,7 @@ rb_monitor_run_bang(VALUE self)
 
     WDM_DEBUG("Running the monitor!");
 
-    Data_Get_Struct(self, WDM_Monitor, monitor);
+    TypedData_Get_Struct(self, WDM_Monitor, &monitor_data_type, monitor);
     already_running = FALSE;
 
     EnterCriticalSection(&monitor->lock);
@@ -503,13 +513,7 @@ rb_monitor_run_bang(VALUE self)
 
     while ( monitor->running ) {
 
-        // Ruby 2.2 removed the 'rb_thread_blocking_region' function. Hence, we now need
-        // to check if the replacement function is defined and use it if it's available.
-        #ifdef HAVE_RB_THREAD_CALL_WITHOUT_GVL
-        waiting_succeeded = rb_thread_call_without_gvl(wait_for_changes, monitor->process_event, stop_monitoring, monitor);
-        #else
-        waiting_succeeded = rb_thread_blocking_region(wait_for_changes, monitor->process_event, stop_monitoring, monitor);
-        #endif
+        waiting_succeeded = (VALUE)rb_thread_call_without_gvl(wait_for_changes, monitor->process_event, stop_monitoring, monitor);
 
         if ( waiting_succeeded == Qfalse ) {
             rb_raise(eWDM_Error, "Failed while waiting for a change in the watched directories!");
@@ -535,7 +539,7 @@ rb_monitor_stop(VALUE self)
 {
     WDM_PMonitor monitor;
 
-    Data_Get_Struct(self, WDM_Monitor, monitor);
+    TypedData_Get_Struct(self, WDM_Monitor, &monitor_data_type, monitor);
 
     stop_monitoring(monitor);
 

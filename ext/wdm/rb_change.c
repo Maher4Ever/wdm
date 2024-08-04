@@ -136,8 +136,6 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
         multibyte_filepath_buffer_size - 1, // -1 because this func takes the chars count, not bytes count
         wdm_rb_enc_utf8);
 
-    OBJ_TAINT(path);
-
     return path;
 }
 

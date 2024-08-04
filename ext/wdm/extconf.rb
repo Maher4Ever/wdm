@@ -16,13 +16,10 @@ def windows?
 end
 
 if windows? and
-   have_library("kernel32") and
-   have_header("windows.h") and
-   have_header("ruby.h")    and
-   have_const('HAVE_RUBY_ENCODING_H')
+  have_library("kernel32") and
+  have_header("windows.h")
 then
-   have_func('rb_thread_call_without_gvl')
-   generate_makefile()
+  generate_makefile()
 else
-  generate_dummy_makefile() 
+  generate_dummy_makefile()
 end
