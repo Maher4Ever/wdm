@@ -51,13 +51,8 @@ extern "C" {
 #if WDM_DEBUG_ENABLED == TRUE
     #define WDM_DEBUG(str, ...) \
         fprintf(stderr, "[DEBUG] (%s@%d): " str "\n", __FILE__, __LINE__, ##__VA_ARGS__)
-
-    #define WDM_WDEBUG(str, ...) \
-        fwprintf(stderr, L"[DEBUG] (%S@%d): " str "\n", __FILE__, __LINE__, ##__VA_ARGS__)
-
 #else
     #define WDM_DEBUG(str, ...)
-    #define WDM_WDEBUG(str, ...)
 #endif
 
 // ----------------------------------------------------------
