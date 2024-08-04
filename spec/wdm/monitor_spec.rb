@@ -196,7 +196,7 @@ describe WDM::Monitor do
       end
     end
 
-    it 'converts short path names to long in the changed files' do
+    it 'converts short path names to long in the changed files', :file_8_3_alias do
       long_file_name  = 'longer_than_12_chars.txt'
       short_file_name = 'LONGER~1.TXT' # For more info, look up "8.3 filenames"
 
