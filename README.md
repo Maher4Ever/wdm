@@ -4,15 +4,14 @@ Windows Directory Monitor (WDM) is a thread-safe ruby library which can be used 
 
 It's mostly implemented in C and uses the Win32 API for a better performance.
 
-**Important**: WDM only runs on ruby versions >= *1.9.2*! 
-
 ## Installation
 
 If you are using Bundler, add the following line to your application's Gemfile:
 
     gem 'wdm'
 
-And then execute:
+Although wdm is only usable on Windows, it can be installed on Linux and Macos as well, so that no :platform option is necessary.
+Then execute:
 
     $ bundle
 
@@ -35,6 +34,7 @@ You can find a comparison of different ruby libraries for watching directory cha
 To start watching directories, you need an instance of `WDM::Monitor`:
 
 ```ruby
+require "wdm"
 monitor = WDM::Monitor.new
 ```
 
@@ -57,103 +57,17 @@ monitor.watch('C:\Users\Maher\Desktop', :default, :directories)
 
 The supported options are:
 
-<table>
-  <thead>
-    <tr>
-      <th>Value</th>
-      <th>Meaning</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>:default</td>
-
-      <td>
-        The default set of options for watching directories. It's a combination of the :files, :directories and the :last_write options.
-      </td>
-    </tr>
-    
-    <tr>
-      <td>:files</td>
-
-      <td>
-        Any file name change in the watched directory or subtree causes a change
-        notification wait operation to return. Changes include renaming, creating, or
-        deleting a file.
-      </td>
-    </tr>
-
-    <tr>
-      <td>:directories</td>
-
-      <td>
-        Any directory-name change in the watched directory or subtree causes a
-        change notification wait operation to return. Changes include creating or
-        deleting a directory.
-      </td>
-    </tr>
-
-    <tr>
-      <td>:attributes</td>
-
-      <td>
-        Any attribute change in the watched directory or subtree causes a change
-        notification wait operation to return.
-      </td>
-    </tr>
-
-    <tr>
-      <td>:size</td>
-
-      <td>
-        Any file-size change in the watched directory or subtree causes a change
-        notification wait operation to return. The operating system detects a change in
-        file size only when the file is written to the disk. For operating systems that
-        use extensive caching, detection occurs only when the cache is sufficiently
-        flushed.
-      </td>
-    </tr>
-
-    <tr>
-      <td>:last_write</td>
-
-      <td>
-        Any change to the last write-time of files in the watched directory or
-        subtree causes a change notification wait operation to return. The operating
-        system detects a change to the last write-time only when the file is written to
-        the disk. For operating systems that use extensive caching, detection occurs
-        only when the cache is sufficiently flushed.
-      </td>
-    </tr>
-
-    <tr>
-      <td>:last_access</td>
-
-      <td>
-        Any change to the last access time of files in the watched directory or
-        subtree causes a change notification wait operation to return.
-      </td>
-    </tr>
-
-    <tr>
-      <td>:creation</td>
-
-      <td>
-        Any change to the creation time of files in the watched directory or subtree
-        causes a change notification wait operation to return.
-      </td>
-    </tr>
-
-    <tr>
-      <td>:security</td>
-
-      <td>
-        Any security-descriptor change in the watched directory or subtree causes a
-        change notification wait operation to return.
-      </td>
-    </tr>
-  </tbody>
-</table>
+| Value | Meaning |
+|-------|---------|
+| :default | The default set of options for watching directories. It's a combination of the :files, :directories and the :last_write options. |
+| :files | Any file name change in the watched directory or subtree causes a change notification wait operation to return. Changes include renaming, creating, or deleting a file. |
+| :directories | Any directory-name change in the watched directory or subtree causes a change notification wait operation to return. Changes include creating or deleting a directory. |
+| :attributes | Any attribute change in the watched directory or subtree causes a change notification wait operation to return. |
+| :size | Any file-size change in the watched directory or subtree causes a change notification wait operation to return. The operating system detects a change in file size only when the file is written to the disk. For operating systems that use extensive caching, detection occurs only when the cache is sufficiently flushed.|
+| :last_write | Any change to the last write-time of files in the watched directory or subtree causes a change notification wait operation to return. The operating system detects a change to the last write-time only when the file is written to the disk. For operating systems that use extensive caching, detection occurs only when the cache is sufficiently flushed. |
+| :last_access | Any change to the last access time of files in the watched directory or subtree causes a change notification wait operation to return. |
+| :creation | Any change to the creation time of files in the watched directory or subtree causes a change notification wait operation to return. |
+| :security | Any security-descriptor change in the watched directory or subtree causes a change notification wait operation to return. |
 
 These options map to the filters that `ReadDirectoryChangesW` takes in its `dwNotifyFilter` parameter. You can find more info on the [docs page](http://msdn.microsoft.com/en-us/library/windows/desktop/aa365465.aspx) of `ReadDirectoryChangesW`. 
 
@@ -190,17 +104,23 @@ Download the source, then run the following:
 
 	$ bundle exec rake compile
 
-To get debug messages, you need to enable them in the `global.h` file:
+To get debug messages, you need to enable them like so:
 
-	#define WDM_DEBUG_ENABLED TRUE // This is disabled by default
+	$ bundle exec rake clean compile -- --with-cflags=-DWDM_DEBUG_ENABLED=TRUE
+
+### Execute the specs
+
+	$ bundle exec rake spec
 
 ## Contributing
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+3. Add a spec for your change
+4. Commit your changes (`git commit -am 'Added some feature'`)
+5. Push to the branch (`git push origin my-new-feature`)
+6. Create new Pull Request
+7. Ensure CI runs green.
 
 ## Author
 
