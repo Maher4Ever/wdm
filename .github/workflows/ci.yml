@@ -92,7 +92,7 @@ jobs:
 
       - name: Run non-windows specs
         if: matrix.os != 'windows'
-        run: ruby -S rspec spec/non-windows.rb -cfdoc
+        run: ruby -S rspec spec/require_spec.rb -cfdoc
 
       - name: Print logs if job failed
         if: ${{ failure() && matrix.os == 'windows' }}
