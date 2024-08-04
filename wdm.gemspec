@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |gem|
-  gem.authors       = ['Maher Sallam']
-  gem.email         = ['maher@sallam.me']
+  gem.authors       = ['Maher Sallam', 'Lars Kanis']
+  gem.email         = ['maher@sallam.me', 'lars@greiz-reinsdorf.de']
   gem.description   = %q{Windows Directory Monitor (WDM) is a library which can be used to monitor directories for changes. It's mostly implemented in C and uses the Win32 API for a better performance.}
   gem.summary       = %q{Windows Directory Monitor (WDM) is a threaded directories monitor for Windows.}
   gem.license      = 'MIT'
