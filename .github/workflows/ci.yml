@@ -1,0 +1,103 @@
+name: Source gem
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * 3" # At 05:00 on Wednesday # https://crontab.guru/#0_5_*_*_3
+  push:
+    branches:
+      - master
+    tags:
+      - "*.*.*"
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - "*"
+permissions:
+  contents: read
+
+jobs:
+  job_build_gem:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - name: Build source gem
+        run: gem build wdm.gemspec
+
+      - name: Upload source gem
+        uses: actions/upload-artifact@v3
+        with:
+          name: source-gem
+          path: "*.gem"
+
+  job_test_gem:
+    name: Test
+    needs: job_build_gem
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows
+            ruby: "head"
+          - os: windows
+            ruby: "2.5"
+          - os: windows
+            ruby: "3.0"
+          - os: windows
+            ruby: "3.3"
+          - os: windows
+            ruby: "mswin"
+          - os: ubuntu
+            ruby: "3.3"
+
+    runs-on: ${{ matrix.os }}-${{ matrix.os_ver || 'latest' }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+
+      - name: Download gem from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: source-gem
+
+      - name: Install required packages Windows
+        if: matrix.os == 'windows' && matrix.ruby != 'mswin'
+        shell: cmd
+        run: ridk exec sh -c "pacman --sync --needed --noconfirm  ${MINGW_PACKAGE_PREFIX}-gcc"
+
+      - name: versions
+        run: |
+          gcc -v
+          gem install bundler:2.3.27 --conservative --no-doc
+          bundler env
+
+      - name: bundle install
+        run: bundle install --retry=3
+
+      - run: gem install --local *.gem --verbose -- --with-cflags=-DWDM_DEBUG_ENABLED=TRUE
+
+      - name: Run windows specs
+        if: matrix.os == 'windows'
+        run: ruby -rwdm -S rspec spec/**/*_spec.rb -cfdoc
+
+      - name: Run non-windows specs
+        if: matrix.os != 'windows'
+        run: ruby -S rspec spec/non-windows.rb -cfdoc
+
+      - name: Print logs if job failed
+        if: ${{ failure() && matrix.os == 'windows' }}
+        run: ridk exec cat *.log
+
+      - name: Print logs if job failed
+        if: ${{ failure() && matrix.os != 'windows' }}
+        run: cat *.log

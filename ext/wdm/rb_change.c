@@ -60,7 +60,7 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
     // Null-terminate the string
     buffer[filename_len] = L'\0';
 
-    WDM_WDEBUG("change in: '%s'", buffer);
+    WDM_DEBUG("change in: '%S'", buffer);
 
     absolute_filepath_len = wcslen(base_dir) + filename_len;
     absolute_filepath = ALLOCA_N(WCHAR, absolute_filepath_len + 1); // 1 for NULL
@@ -69,7 +69,7 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
     wcscat(absolute_filepath, base_dir);
     wcscat(absolute_filepath, buffer);
 
-    WDM_WDEBUG("absolute path is: '%s'", absolute_filepath);
+    WDM_DEBUG("absolute path is: '%S'", absolute_filepath);
 
     _wsplitpath(buffer, NULL, NULL, file, ext);
 
@@ -78,7 +78,7 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
     if ( file[0] != L'\0' ) wcscat(filename, file);
     if ( ext[0]  != L'\0' ) wcscat(filename, ext);
 
-    WDM_WDEBUG("filename: '%s'", filename);
+    WDM_DEBUG("filename: '%S'", filename);
 
     filename_len = wcslen(filename);
 
@@ -109,7 +109,7 @@ extract_absolute_path_from_notification(const LPWSTR base_dir, const PFILE_NOTIF
         if (GetLongPathNameW(unicode_absolute_filepath, absolute_long_filepath, WDM_MAX_WCHAR_LONG_PATH) != 0) {
             absolute_filepath = absolute_long_filepath + 4; // Skip first 4 pointers of "\\?\"
             absolute_filepath_len = wcslen(absolute_filepath);
-            WDM_WDEBUG("Short path converted to long: '%s'", absolute_filepath);
+            WDM_DEBUG("Short path converted to long: '%S'", absolute_filepath);
         }
         else {
             WDM_DEBUG("Can't convert short path to long: '%s'", rb_w32_strerror(GetLastError()));

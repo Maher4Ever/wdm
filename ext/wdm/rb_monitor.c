@@ -206,7 +206,7 @@ combined_watch(BOOL recursively, int argc, VALUE *argv, VALUE self)
 
     MultiByteToWideChar(CP_UTF8, 0, RSTRING_PTR(os_encoded_directory), -1, entry->user_data->dir, directory_letters_count);
 
-    WDM_WDEBUG("New path to watch: '%s'", entry->user_data->dir);
+    WDM_DEBUG("New path to watch: '%S'", entry->user_data->dir);
 
     entry->user_data->dir = wdm_utils_full_pathname(entry->user_data->dir);
 
@@ -244,7 +244,7 @@ combined_watch(BOOL recursively, int argc, VALUE *argv, VALUE self)
 
     wdm_monitor_update_head(monitor, entry);
 
-    WDM_WDEBUG("Watching directory: '%s'", entry->user_data->dir);
+    WDM_DEBUG("Watching directory: '%S'", entry->user_data->dir);
 
     return Qnil;
 }
@@ -288,7 +288,7 @@ handle_entry_change(
     data_to_process = wdm_queue_item_new(WDM_QUEUE_ITEM_TYPE_DATA);
     data_to_process->data = wdm_queue_item_data_new();
 
-    WDM_WDEBUG("Change detected in '%s'", param->entry->user_data->dir);
+    WDM_DEBUG("Change detected in '%S'", param->entry->user_data->dir);
 
     data_to_process->data->user_data = param->entry->user_data;
 
