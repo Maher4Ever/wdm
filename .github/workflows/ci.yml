@@ -21,7 +21,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -31,7 +31,7 @@ jobs:
         run: gem build wdm.gemspec
 
       - name: Upload source gem
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: source-gem
           path: "*.gem"
@@ -59,14 +59,14 @@ jobs:
     runs-on: ${{ matrix.os }}-${{ matrix.os_ver || 'latest' }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
 
       - name: Download gem from build job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: source-gem
 
